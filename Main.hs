@@ -37,7 +37,9 @@ createRandomImage width height = Image {
         height = height,
         pixels = do
                 j <- reverse [0..height-1]
-                return [pixelColor i j width height | i <- [0..width-1]]
+                return $ do
+                    i <- [0..width-1]
+                    return $ pixelColor i j width height
         }
 
 main :: IO ()
