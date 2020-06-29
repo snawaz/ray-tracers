@@ -24,18 +24,20 @@ data Image = Image {
         pixels :: [[Color]]
     } deriving (Show)
 
+pixelColor :: Int -> Int -> Int -> Int -> Color
+pixelColor i j width height = Color(r, g, b)
+    where
+        r = floor $ 255.99 * fromIntegral i / fromIntegral (width - 1)
+        g = floor $ 255.99 * fromIntegral j / fromIntegral (height - 1)
+        b = floor $ 255.99 * 0.25
+
 createRandomImage :: Int -> Int -> Image
 createRandomImage width height = Image {
         width = width,
         height = height,
         pixels = do
                 j <- reverse [0..height-1]
-                let makeColor i j = Color(r, g, b)
-                        where
-                            r = floor $ 255.99 * fromIntegral i / fromIntegral (width - 1)
-                            g = floor $ 255.99 * fromIntegral j / fromIntegral (height - 1)
-                            b = floor $ 255.99 * 0.25
-                return [makeColor i j | i <- [0..width-1]]
+                return [pixelColor i j width height | i <- [0..width-1]]
         }
 
 main :: IO ()
