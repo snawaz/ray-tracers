@@ -50,7 +50,8 @@ haskellPackages.shellFor {
     hlibgit2
     gitlib-libgit2
     cabal-install 
-    stylish-haskell 
+    stylish-haskell
+    haskell-formatter
   ];
   withHoogle = true;
   buildInputs = [ 
@@ -59,6 +60,7 @@ haskellPackages.shellFor {
     pkgs.openssl
     pkgs.zlib # required on fish
     hie
+    haskellPackages.stylish-haskell
   ]; 
   shellHook = ''
     # fix: can't load .so/.DLL for: libicuuc.dylib (dlopen(libicuuc.dylib, 5): image not found)

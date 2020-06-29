@@ -8,9 +8,10 @@
 
 module Main where
 
-import System.IO                  (IOMode (AppendMode, WriteMode), hFlush, hPutStrLn, stdout, withFile)
-import Text.Printf        (printf)
-import Data.List (intercalate)
+import           Data.List   (intercalate)
+import           System.IO   (IOMode (AppendMode, WriteMode), hFlush, hPutStrLn,
+                              stdout, withFile)
+import           Text.Printf (printf)
 
 newtype Color = Color (Int, Int, Int) deriving(Show)
 
@@ -18,7 +19,7 @@ color :: Color -> String
 color (Color(r,g,b)) = printf "%3d %3d %3d" r g b
 
 data Image = Image {
-        width :: Int,
+        width  :: Int,
         height :: Int,
         pixels :: [[Color]]
     } deriving (Show)
