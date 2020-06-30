@@ -8,6 +8,9 @@
 
 module Main where
 
+
+import Vec
+
 import           Data.List   (intercalate)
 import           System.IO   (IOMode (AppendMode, WriteMode), hFlush, hPutStrLn,
                               stdout, withFile)
@@ -44,9 +47,14 @@ createRandomImage width height = Image {
 
 main :: IO ()
 main = do
-    -- let image = createRandomImage 4 6-- 256 256
-    let image = createRandomImage 256 256
+    let image = createRandomImage 4 6-- 256 256
+    -- let image = createRandomImage 256 256
     putStrLn "P3"
     putStrLn $ show (width image) ++ " " ++ show (height image)
     print 255
     putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
+    print $ dot (toVec 1 2 3) (toVec 3 4 5)
+    print $ apply (*10) (toVec 1 2 3)
+    print $ apply (/10) (toVec 1 2 3)
+    print $ len2 (toVec 1 2 3)
+    print $ len (toVec 1 2 3)
