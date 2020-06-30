@@ -11,6 +11,8 @@ data Vec3 = Vec3 {
         z :: Double
     } deriving (Show)
 
+type Point3 = Vec3
+
 toVec :: Double -> Double -> Double -> Vec3
 toVec x y z = Vec3 { x, y, z }
 
@@ -44,3 +46,5 @@ len2 v = dot v v
 
 len :: Vec3 -> Double
 len = sqrt . len2
+
+unit v = apply (/ len v) v

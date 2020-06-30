@@ -19,7 +19,7 @@ extra-source-files:  CHANGELOG.md
 
 executable ray-tracers
   main-is:             Main.hs
-  other-modules:       Vec Utils
+  other-modules:       Vec Utils Ray Image
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13
   -- hs-source-dirs:
