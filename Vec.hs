@@ -3,6 +3,8 @@
 
 module Vec where
 
+import           Utils
+
 data Vec3 = Vec3 {
         x :: Double,
         y :: Double,
@@ -20,7 +22,12 @@ fromList [x, y, z] = toVec x y z
 
 instance Num Vec3 where
     v1 + v2 = fromList $ zipWith (+) (toList v1) (toList v2)
-    v1 * v2 = fromList $ zipWith (*) (toList v1) (toList v2)
+    v1 * v2 = fromList $ zipWith (-) a b
+                            where
+                                l1 = toList v1
+                                l2 = toList v2
+                                a = zipWith (*) (rotate 1 l1) (rotate 2 l2)
+                                b = zipWith (*) (rotate 2 l1) (rotate 1 l2)
     v1 - v2 = fromList $ zipWith (-) (toList v1) (toList v2)
     abs    v = fromList $ fmap abs (toList v)
     signum v = fromList $ fmap signum (toList v)
