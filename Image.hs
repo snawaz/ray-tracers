@@ -32,9 +32,19 @@ pixelColor i j width height = Color(r, g, b)
         g = floor $ 255.99 * fromIntegral j / fromIntegral (height - 1)
         b = floor $ 255.99 * 0.25
 
-rayColor (Ray origin direction) = toColor $ p1 + p2
+rayColor (Ray origin direction) = toColor $ if hitSphere (toVec 0 0 (-1)) 0.5 (Ray origin direction)
+                                               then toVec 1 0 0
+                                               else p1 + p2
     where
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         p1 = apply (*(1.0 - t)) (toVec 1 1 1)
         p2 = apply (*t) (toVec 0.5 0.7 1.0)
+
+hitSphere center radius (Ray origin direction) = discriminant > 0
+    where
+        oc = origin - center
+        a = len2 direction
+        b = 2.0 * dot oc direction
+        c = len2 oc - radius^2
+        discriminant = b^2 - 4*a*c
