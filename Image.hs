@@ -44,10 +44,10 @@ rayColor (Ray origin direction) = toColor $ if h > 0.0
 
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0
-                                                    else (-b - sqrt discriminant) / (2.0 * a)
+                                                    else (-half_b - sqrt discriminant) / a
     where
         oc = origin - center
         a = len2 direction
-        b = 2.0 * dot oc direction
+        half_b = dot oc direction
         c = len2 oc - radius^2
-        discriminant = b^2 - 4*a*c
+        discriminant = half_b^2 - a*c
