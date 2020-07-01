@@ -15,16 +15,11 @@ import           Hittable
 import           Image
 import           Ray
 import           Vec
+import           Utils
+import Camera
+import System.Random
 
-aspectRatio = 16.0 / 9.0;
-viewportHeight = 2.0
-viewportWidth = aspectRatio * viewportHeight
-focalLength = 1.0
-
-origin = toVec 0 0 0
-horizontal = toVec viewportWidth 0 0
-vertical = toVec 0 viewportHeight 0
-loweLeftCorner = origin - (apply (/2) horizontal) - (apply (/2) vertical) - toVec 0 0 focalLength
+samplePerPixels = 100
 
 world = HittableList [
         (Sphere (toVec 0 0 (-1)) 0.5),
@@ -38,51 +33,34 @@ main = do
     -- testTools
 
 writeImage imageWidth = do
-    -- let image = createRandomImage 2 3-- 256 256
-    let image = createImage imageWidth $ floor (fromIntegral imageWidth / aspectRatio)
-    -- let image = createRandomImage 256 256
+    let gen = mkStdGen 22
+    let randList = (randomRs (0,1) gen) :: [Double]
+    let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) randList
     putStrLn "P3"
     putStrLn $ show (width image) ++ " " ++ show (height image)
     print 255
     putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
 
 testTools = do
-    print origin
-    print horizontal
-    print vertical
-    print (-vertical)
-    print loweLeftCorner
-    print (-loweLeftCorner)
-    -- print $ dot (toVec 1 2 3) (toVec 3 4 5)
-    -- print $ apply (*10) (toVec 1 2 3)
-    -- print $ apply (/10) (toVec 1 2 3)
-    -- print $ (fromList [5.0, 7.0, 1.0]) + (fromList [4.0, 4.0, 3.0])
-    -- print $ (fromList [5.0, 7.0, 1.0]) - (fromList [4.0, 4.0, 3.0])
-    -- print $ (fromList [5.0, 7.0, 1.0]) * (fromList [4.0, 4.0, 3.0])
-    -- print $ len2 (toVec 1 2 3)
-    -- print $ len (toVec 1 2 3)
+    let gen = mkStdGen 22
+    let r = (randomRs (0,1) gen) :: [Double]
+    print $ take 5 r
+    print $ take 6 r
 
-createImage :: Int -> Int -> Image
-createImage width height = Image {
+createImage :: Int -> Int -> [Double] -> Image
+createImage width height randList = Image {
     width = width,
     height = height,
     pixels = do
         j <- reverse [0..height - 1]
         return $ do
             i <- [0..width - 1]
-            let u = fromIntegral i / fromIntegral (width - 1)
-            let v = fromIntegral j / fromIntegral (height - 1)
-            let r = Ray origin (loweLeftCorner + (apply (*u) horizontal) + (apply (*v) vertical) - origin)
-            return $ rayColor r world
+            let rands = take samplePerPixels randList
+            let color = foldr (+) (toVec 0 0 0) $ fmap (randomRayColor i j world) rands
+            return $ fromVec $ apply (/fromIntegral samplePerPixels) color
     }
-
-createRandomImage :: Int -> Int -> Image
-createRandomImage width height = Image {
-        width = width,
-        height = height,
-        pixels = do
-                j <- reverse [0..height-1]
-                return $ do
-                    i <- [0..width-1]
-                    return $ pixelColor i j width height
-        }
+        where
+            randomRayColor i j world rand = fromColor $ rayColor (ray camera u v) world
+                where
+                    u = (fromIntegral i + rand) / fromIntegral (width - 1)
+                    v = (fromIntegral j + rand) / fromIntegral (height - 1)

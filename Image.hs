@@ -21,6 +21,9 @@ toColor Vec3 {x, y, z} = Color (r, g, b)
         g = floor $ 255.99 * y
         b = floor $ 255.99 * z
 
+fromColor (Color(r, g, b)) = Vec3 { x = fromIntegral r, y = fromIntegral g,  z = fromIntegral b }
+fromVec Vec3{x, y, z} = Color (floor x, floor y, floor z)
+
 data Image = Image {
         width  :: Int,
         height :: Int,
