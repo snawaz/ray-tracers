@@ -3,12 +3,12 @@
 
 module Image where
 
+import           Data.Maybe
 import           Text.Printf (printf)
-import Data.Maybe
 
-import Vec
-import Ray
-import Hittable
+import           Hittable
+import           Ray
+import           Vec
 
 newtype Color = Color (Int, Int, Int) deriving(Show)
 

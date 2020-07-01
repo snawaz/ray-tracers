@@ -1,11 +1,11 @@
 
 module Hittable where
 
-import GHC.OldList (find)
-import Data.Maybe
+import           Data.Maybe
+import           GHC.OldList (find)
 
-import Vec
-import Ray
+import           Ray
+import           Vec
 
 data HitRecord = HitRecord Point3 Vec3 Double Bool
 

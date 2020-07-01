@@ -1,7 +1,7 @@
 
 module Ray where
 
-import Vec
+import           Vec
 
 data Ray = Ray Point3 Vec3
 

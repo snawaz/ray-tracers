@@ -8,16 +8,16 @@
 
 module Main where
 
-import           Data.List (intercalate)
-import           System.IO (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
+import           Data.List     (intercalate)
+import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
 
+import           Camera
 import           Hittable
 import           Image
 import           Ray
-import           Vec
+import           System.Random
 import           Utils
-import Camera
-import System.Random
+import           Vec
 
 samplePerPixels = 100
 

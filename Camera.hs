@@ -3,8 +3,8 @@
 
 module Camera where
 
-import Vec
-import Ray
+import           Ray
+import           Vec
 
 aspectRatio = 16.0 / 9.0;
 viewportHeight = 2.0
@@ -12,10 +12,10 @@ viewportWidth = aspectRatio * viewportHeight
 focalLength = 1.0
 
 data Camera = Camera {
-    origin         :: Point3,
+    origin          :: Point3,
     lowerLeftCorner :: Point3,
-    horizontal     :: Vec3,
-    vertical       :: Vec3
+    horizontal      :: Vec3,
+    vertical        :: Vec3
 }
 
 camera = Camera { origin, lowerLeftCorner, horizontal, vertical }
