@@ -33,22 +33,18 @@ world = HittableList [
 
 main :: IO ()
 main = do
-    writeImage
+    -- writeImage 1800
+    writeImage 800
     -- testTools
 
-createImage :: Int -> Int -> Image
-createImage width height = Image {
-    width = width,
-    height = height,
-    pixels = do
-        j <- reverse [0..height - 1]
-        return $ do
-            i <- [0..width - 1]
-            let u = fromIntegral i / fromIntegral (width - 1)
-            let v = fromIntegral j / fromIntegral (height - 1)
-            let r = Ray origin (loweLeftCorner + (apply (*u) horizontal) + (apply (*v) vertical) - origin)
-            return $ rayColor r world
-    }
+writeImage imageWidth = do
+    -- let image = createRandomImage 2 3-- 256 256
+    let image = createImage imageWidth $ floor (fromIntegral imageWidth / aspectRatio)
+    -- let image = createRandomImage 256 256
+    putStrLn "P3"
+    putStrLn $ show (width image) ++ " " ++ show (height image)
+    print 255
+    putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
 
 testTools = do
     print origin
@@ -66,14 +62,19 @@ testTools = do
     -- print $ len2 (toVec 1 2 3)
     -- print $ len (toVec 1 2 3)
 
-writeImage = do
-    -- let image = createRandomImage 2 3-- 256 256
-    let image = createImage 384 $ floor (384 / aspectRatio)
-    -- let image = createRandomImage 256 256
-    putStrLn "P3"
-    putStrLn $ show (width image) ++ " " ++ show (height image)
-    print 255
-    putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
+createImage :: Int -> Int -> Image
+createImage width height = Image {
+    width = width,
+    height = height,
+    pixels = do
+        j <- reverse [0..height - 1]
+        return $ do
+            i <- [0..width - 1]
+            let u = fromIntegral i / fromIntegral (width - 1)
+            let v = fromIntegral j / fromIntegral (height - 1)
+            let r = Ray origin (loweLeftCorner + (apply (*u) horizontal) + (apply (*v) vertical) - origin)
+            return $ rayColor r world
+    }
 
 createRandomImage :: Int -> Int -> Image
 createRandomImage width height = Image {
