@@ -4,9 +4,11 @@
 module Image where
 
 import           Text.Printf (printf)
+import Data.Maybe
 
 import Vec
 import Ray
+import Hittable
 
 newtype Color = Color (Int, Int, Int) deriving(Show)
 
@@ -32,15 +34,14 @@ pixelColor i j width height = Color(r, g, b)
         g = floor $ 255.99 * fromIntegral j / fromIntegral (height - 1)
         b = floor $ 255.99 * 0.25
 
-rayColor (Ray origin direction) = toColor $ if h > 0.0
-                                               then apply (*0.5) $ apply (+1) $ unit $ pointAt (Ray origin direction) h - toVec 0 0 (-1)
-                                               else p1 + p2
+rayColor (Ray origin direction) world = toColor $ fromMaybe default_color $ do
+                                                (HitRecord _ normal _ _ ) <- h
+                                                return $ apply (*0.5) $ apply (+1) normal
     where
-        h = hitSphere (toVec 0 0 (-1)) 0.5 (Ray origin direction)
+        h = hit world (Ray origin direction) 0 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
-        p1 = apply (*(1.0 - t)) (toVec 1 1 1)
-        p2 = apply (*t) (toVec 0.5 0.7 1.0)
+        default_color = apply (*(1.0 - t)) (toVec 1 1 1) + apply (*t) (toVec 0.5 0.7 1.0)
 
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0
