@@ -37,11 +37,11 @@ pixelColor i j width height = Color(r, g, b)
         g = floor $ 255.99 * fromIntegral j / fromIntegral (height - 1)
         b = floor $ 255.99 * 0.25
 
-rayColor (Ray origin direction) world = toColor $ fromMaybe default_color $ do
+rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ do
                                                 (HitRecord _ normal _ _ ) <- h
                                                 return $ apply (*0.5) $ apply (+1) normal
     where
-        h = hit world (Ray origin direction) 0 100000000000
+        h = hit world ray 0 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         default_color = apply (*(1.0 - t)) (toVec 1 1 1) + apply (*t) (toVec 0.5 0.7 1.0)
