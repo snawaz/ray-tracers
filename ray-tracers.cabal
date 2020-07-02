@@ -25,6 +25,7 @@ executable ray-tracers
                        Image
                        Hittable
                        Camera
+                       BaseVec
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13,
                        random >=1.0 && <1.1

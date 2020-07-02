@@ -63,6 +63,7 @@ haskellPackages.shellFor {
     haskellPackages.stylish-haskell
   ]; 
   shellHook = ''
+    alias ls="ls --color"
     # fix: can't load .so/.DLL for: libicuuc.dylib (dlopen(libicuuc.dylib, 5): image not found)
     # also coc.vim does not work as it relies on hie: https://gitlab.haskell.org/ghc/ghc/issues/9868
     # set DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH ${pkgs.icu}

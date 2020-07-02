@@ -6,6 +6,7 @@ import           GHC.OldList (find)
 
 import           Ray
 import           Vec
+import           BaseVec
 
 data HitRecord = HitRecord Point3 Vec3 Double Bool
 

@@ -18,6 +18,9 @@ import           Ray
 import           System.Random
 import           Utils
 import           Vec
+-- import  BaseVec 
+import  qualified BaseVec as V
+import            BaseVec hiding((+), (-), (*), (/)) 
 
 samplePerPixels = 100
 
@@ -29,7 +32,8 @@ world = HittableList [
 main :: IO ()
 main = do
     -- writeImage 1800
-    writeImage 800
+    -- writeImage 800
+    writeImage 384
     -- testTools
 
 writeImage imageWidth = do
@@ -46,6 +50,23 @@ testTools = do
     let r = (randomRs (0,1) gen) :: [Double]
     print $ take 5 r
     print $ take 6 r
+    let a = (from 5)  :: Kolor
+    let b = (vec 1 2 3) :: Kolor
+    -- print $ a V.+ b
+    -- print $ a V.- b
+    -- print $ a V.* b
+    -- print $ a <*> b
+    -- print $ a V./ b
+    let a = (from 5)  :: Vector
+    let b = (vec 1 2 3) :: Vector
+    -- print $ a V.+ b
+    -- print $ a V.- b
+    -- print $ a V.* b
+    -- print $ a <.> b
+    -- print $ a <.*> b
+    -- print (-a)
+    -- print $ a V./ b
+    print "DONE"
 
 createImage :: Int -> Int -> [Double] -> Image
 createImage width height randList = Image {

@@ -4,3 +4,7 @@ all:
 	cabal v2-build
 	./ray-tracers >> image.ppm
 	open image.ppm
+
+build:
+	cabal v2-build
+
