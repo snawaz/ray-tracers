@@ -42,9 +42,7 @@ toVec = vec
 -- dot :: Vec3 -> Vec3 -> Double
 -- dot v1 v2 = sum $ zipWith (*) (toList v1) (toList v2)
 
-apply :: (Double -> Double) -> Vec3 ->  Vec3
--- apply f v = fromList $ fmap f (toList v)
-apply f (BaseVec v) = BaseVec $ fmap f v
+apply = fmap
 
 len2 :: Vec3 -> Double
 len2 v = dot v v

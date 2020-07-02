@@ -18,9 +18,9 @@ import           Ray
 import           System.Random
 import           Utils
 import           Vec
--- import  BaseVec 
-import  qualified BaseVec as V
-import            BaseVec hiding((+), (-), (*), (/)) 
+import  BaseVec 
+--import  qualified BaseVec as V
+--import            BaseVec hiding((+), (-), (*), (/)) 
 
 samplePerPixels = 100
 
@@ -33,8 +33,8 @@ main :: IO ()
 main = do
     -- writeImage 1800
     -- writeImage 800
-    writeImage 384
-    -- testTools
+    -- writeImage 384
+    testTools
 
 writeImage imageWidth = do
     let gen = mkStdGen 22
@@ -57,13 +57,15 @@ testTools = do
     -- print $ a V.* b
     -- print $ a <*> b
     -- print $ a V./ b
+    let n = 2.0 :: Double
     let a = (from 5)  :: Vector
     let b = (vec 1 2 3) :: Vector
     -- print $ a V.+ b
     -- print $ a V.- b
     -- print $ a V.* b
     -- print $ a <.> b
-    -- print $ a <.*> b
+    print $ a <.*> n
+    --print $ a .* b
     -- print (-a)
     -- print $ a V./ b
     print "DONE"
