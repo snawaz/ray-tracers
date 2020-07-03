@@ -43,9 +43,6 @@ x (BaseVec [x', _, _]) = x'
 y (BaseVec [_, y', _]) = y'
 z (BaseVec [_, _, z']) = z'
 
-type Kolor  = BaseVec Integer
-type Vector = BaseVec Double
-
 dot :: Num a => BaseVec a -> BaseVec a -> a
 dot (BaseVec v1) (BaseVec v2) = sum $ zipWith (*) v1 v2
 
