@@ -19,8 +19,6 @@ import           System.Random
 import           Utils
 import           Vec
 import  BaseVec 
---import  qualified BaseVec as V
---import            BaseVec hiding((+), (-), (*), (/)) 
 
 samplePerPixels = 100
 
