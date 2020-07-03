@@ -27,6 +27,7 @@ executable ray-tracers
                        Camera
                        BaseVec
                        Colors
+                       Samplings
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13,
                        random >=1.0 && <1.1
