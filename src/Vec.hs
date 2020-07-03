@@ -16,15 +16,15 @@ type Vec3 = BaseVec Double
 
 type Point3 = Vec3
 
-toVec :: Double -> Double -> Double -> Vec3
--- toVec x y z = Vec3 { x, y, z }
-toVec = vec 
+-- vec :: Double -> Double -> Double -> Vec3
+-- vec x y z = Vec3 { x, y, z }
+-- vec = vec 
 
 -- :toList :: Vec3 -> [Double]
 -- :toList Vec3{x, y, z} = [x, y, z]
 -- :
 -- :fromList :: [Double] -> Vec3
--- :fromList [x, y, z] = toVec x y z
+-- :fromList [x, y, z] = vec x y z
 -- :
 -- :instance Num Vec3 where
 -- :    v1 + v2 = fromList $ zipWith (+) (toList v1) (toList v2)

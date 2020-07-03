@@ -25,8 +25,8 @@ import  BaseVec
 samplePerPixels = 100
 
 world = HittableList [
-        (Sphere (toVec 0 0 (-1)) 0.5),
-        (Sphere (toVec 0 (-100.5) (-1)) 100)
+        (Sphere (vec 0 0 (-1)) 0.5),
+        (Sphere (vec 0 (-100.5) (-1)) 100)
     ]
 
 main :: IO ()
@@ -89,7 +89,7 @@ createImage width height randList = Image {
         return $ do
             i <- [0..width - 1]
             let rands = take samplePerPixels randList
-            let color = foldr (+) (toVec 0 0 0) $ fmap (randomRayColor i j world) rands
+            let color = foldr (+) (vec 0 0 0) $ fmap (randomRayColor i j world) rands
             return $ fromVec $ color ./ fromIntegral samplePerPixels
     }
         where

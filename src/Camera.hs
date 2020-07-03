@@ -21,10 +21,10 @@ data Camera = Camera {
 
 camera = Camera { origin, lowerLeftCorner, horizontal, vertical }
     where
-        origin = toVec 0 0 0
-        horizontal = toVec viewportWidth 0 0
-        vertical = toVec 0 viewportHeight 0
-        lowerLeftCorner = origin - horizontal ./ 2 - vertical ./ 2 - toVec 0 0 focalLength
+        origin = vec 0 0 0
+        horizontal = vec viewportWidth 0 0
+        vertical = vec 0 viewportHeight 0
+        lowerLeftCorner = origin - horizontal ./ 2 - vertical ./ 2 - vec 0 0 focalLength
 
 ray Camera{origin, lowerLeftCorner, horizontal, vertical} u v =
     Ray origin (lowerLeftCorner + horizontal .* u + vertical .* v - origin)

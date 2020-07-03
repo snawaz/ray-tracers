@@ -39,7 +39,7 @@ rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ 
         h = hit world ray 0 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
-        default_color = toVec 1 1 1 .* (1.0 - t) + toVec 0.5 0.7 1.0 .* t
+        default_color = vec 1 1 1 .* (1.0 - t) + vec 0.5 0.7 1.0 .* t
 
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0
