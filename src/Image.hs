@@ -4,7 +4,6 @@
 module Image where
 
 import           Data.Maybe
-import           Text.Printf (printf)
 
 import           BaseVec
 import           Hittable
@@ -22,9 +21,6 @@ instance Num SampledColor where
     abs (SampledColor(n, v)) = SampledColor(n, abs v)
     signum (SampledColor(n, v)) = SampledColor(n, signum v)
     fromInteger n = SampledColor(fromInteger n, fromInteger 0)
-
-color :: Color -> String
-color (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
 
 -- class From a where
 --    from :: a -> Color

@@ -10,6 +10,7 @@ module Main where
 
 import           Data.List     (intercalate)
 import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
+import           Text.Printf (printf)
 
 import           BaseVec
 import           Camera
@@ -38,10 +39,12 @@ writeImage imageWidth = do
     let gen = mkStdGen 22
     let randList = (randomRs (0,1) gen) :: [Double]
     let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) randList
+    let fmtColor (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
+
     putStrLn "P3"
     putStrLn $ show (width image) ++ " " ++ show (height image)
     print 255
-    putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
+    putStrLn $ unlines [ intercalate "    " [fmtColor c | c <- row] | row <- pixels image]
 
 
 kolor :: Kolor -> Kolor
