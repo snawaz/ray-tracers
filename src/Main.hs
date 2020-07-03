@@ -87,11 +87,11 @@ createImage width height randList = Image {
         return $ do
             i <- [0..width - 1]
             let rands = take samplePerPixels randList
-            let color = foldr (+) (vec 0 0 0) $ fmap (randomRayColor i j world) rands
-            return $ fromVec $ color ./ fromIntegral samplePerPixels
+            let sampledColor = foldr (+) (SampledColor(samplePerPixels, vec 0 0 0)) $ fmap (randomRayColor i j world) rands
+            return $ fromSampledColor sampledColor
     }
         where
-            randomRayColor i j world rand = fromColor $ rayColor (ray camera u v) world
+            randomRayColor i j world rand = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
                 where
                     u = (fromIntegral i + rand) / fromIntegral (width - 1)
                     v = (fromIntegral j + rand) / fromIntegral (height - 1)

@@ -13,18 +13,32 @@ import           Vec
 
 type Color = BaseVec Int
 type FractionalColor = BaseVec Double
+newtype SampledColor = SampledColor (Int, BaseVec Double)
+
+instance Num SampledColor where
+    (SampledColor(m, v1)) + (SampledColor (n, v2)) = SampledColor(n, v1 + v2)
+    (SampledColor(m, v1)) * (SampledColor (n, v2)) = SampledColor(n, v1 * v2)
+    (SampledColor(m, v1)) - (SampledColor (n, v2)) = SampledColor(n, v1 - v2)
+    abs (SampledColor(n, v)) = SampledColor(n, abs v)
+    signum (SampledColor(n, v)) = SampledColor(n, signum v)
+    fromInteger n = SampledColor(fromInteger n, fromInteger 0)
 
 color :: Color -> String
 color (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
 
+-- class From a where
+--    from :: a -> Color
+
+--instance ToColor
+
 toColor :: FractionalColor -> Color
 toColor = fmap (floor . (255.99 *))
 
-fromColor :: Color -> Vec3
-fromColor = fmap fromIntegral
+fromSampledColor :: SampledColor -> Color
+fromSampledColor (SampledColor(n, v)) = fmap floor $ v ./ fromIntegral n
 
-fromVec :: Vec3 -> Color
-fromVec = fmap floor
+toSampledColor :: Int -> Color -> SampledColor
+toSampledColor n color = SampledColor(n, fmap fromIntegral color)
 
 data Image = Image {
         width  :: Int,
@@ -32,6 +46,7 @@ data Image = Image {
         pixels :: [[Color]]
     } deriving (Show)
 
+rayColor :: (Hittable a) => Ray -> a -> Color
 rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ do
                                                 (HitRecord _ normal _ _ ) <- h
                                                 return $ (normal .+ 1) .* 0.5
