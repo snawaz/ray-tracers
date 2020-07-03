@@ -11,6 +11,7 @@ module Main where
 import           Data.List     (intercalate)
 import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
 
+import           BaseVec
 import           Camera
 import           Hittable
 import           Image
@@ -18,7 +19,6 @@ import           Ray
 import           System.Random
 import           Utils
 import           Vec
-import  BaseVec 
 
 samplePerPixels = 100
 
@@ -58,9 +58,9 @@ testTools = do
     print $ a + b
     print $ a - b
     print $ a * b
-    print $ kolor $ a - b .* 2 
-    print $ kolor $ a - (b .* 2) 
-    print $ kolor $ (a - b) .* 2 
+    print $ kolor $ a - b .* 2
+    print $ kolor $ a - (b .* 2)
+    print $ kolor $ (a - b) .* 2
     -- print $ 3 .+ a
     -- print $ a .+ n
     -- print $ a .- n

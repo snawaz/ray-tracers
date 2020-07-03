@@ -4,9 +4,9 @@ module Hittable where
 import           Data.Maybe
 import           GHC.OldList (find)
 
+import           BaseVec
 import           Ray
 import           Vec
-import           BaseVec
 
 data HitRecord = HitRecord Point3 Vec3 Double Bool
 

@@ -6,10 +6,10 @@ module Image where
 import           Data.Maybe
 import           Text.Printf (printf)
 
+import           BaseVec
 import           Hittable
 import           Ray
 import           Vec
-import           BaseVec
 
 type Color = BaseVec Int
 type FractionalColor = BaseVec Double

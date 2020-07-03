@@ -3,9 +3,9 @@
 
 module Camera where
 
+import           BaseVec
 import           Ray
 import           Vec
-import           BaseVec
 
 aspectRatio = 16.0 / 9.0;
 viewportHeight = 2.0

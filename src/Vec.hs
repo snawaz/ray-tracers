@@ -1,7 +1,7 @@
 
 module Vec where
 
-import BaseVec
+import           BaseVec
 import           Utils
 
 type Vec3 = BaseVec Double
