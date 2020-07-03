@@ -11,15 +11,16 @@ module Main where
 import           Data.List     (intercalate)
 import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
 import           Text.Printf (printf)
+import           System.Random
 
 import           BaseVec
 import           Camera
 import           Hittable
 import           Image
 import           Ray
-import           System.Random
 import           Utils
 import           Vec
+import           Colors
 
 samplePerPixels = 100
 
@@ -91,7 +92,7 @@ createImage width height randList = Image {
             i <- [0..width - 1]
             let rands = take samplePerPixels randList
             let sampledColor = foldr (+) (SampledColor(samplePerPixels, vec 0 0 0)) $ fmap (randomRayColor i j world) rands
-            return $ fromSampledColor sampledColor
+            return $ toColor sampledColor
     }
         where
             randomRayColor i j world rand = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
