@@ -3,19 +3,19 @@
 
 module Image where
 
-import           Data.Maybe
 import           Data.List     (intercalate)
+import           Data.Maybe
 import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
 import           System.Random
-import           Text.Printf (printf)
+import           Text.Printf   (printf)
 
 import           BaseVec
 import           Camera
+import           Colors
 import           Hittable
 import           Ray
 import           Utils
 import           Vec
-import           Colors
 
 data Image = Image {
         width  :: Int,
