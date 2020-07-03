@@ -33,8 +33,8 @@ main :: IO ()
 main = do
     -- writeImage 1800
     -- writeImage 800
-    -- writeImage 384
-    testTools
+    writeImage 384
+    -- testTools
 
 writeImage imageWidth = do
     let gen = mkStdGen 22
@@ -45,29 +45,39 @@ writeImage imageWidth = do
     print 255
     putStrLn $ unlines [ intercalate "    " [color c | c <- row] | row <- pixels image]
 
+
+kolor :: Kolor -> Kolor
+kolor a = a
+
 testTools = do
     let gen = mkStdGen 22
     let r = (randomRs (0,1) gen) :: [Double]
     print $ take 5 r
     print $ take 6 r
+    let n = 2 :: Int
     let a = (from 5)  :: Kolor
     let b = (vec 1 2 3) :: Kolor
-    -- print $ a V.+ b
-    -- print $ a V.- b
-    -- print $ a V.* b
-    -- print $ a <*> b
-    -- print $ a V./ b
-    let n = 2.0 :: Double
-    let a = (from 5)  :: Vector
-    let b = (vec 1 2 3) :: Vector
-    -- print $ a V.+ b
-    -- print $ a V.- b
-    -- print $ a V.* b
-    -- print $ a <.> b
-    print $ a <.*> n
-    --print $ a .* b
-    -- print (-a)
-    -- print $ a V./ b
+    print $ a + b
+    print $ a - b
+    print $ a * b
+    print $ kolor $ a - b .* 2 
+    print $ kolor $ a - (b .* 2) 
+    print $ kolor $ (a - b) .* 2 
+    -- print $ 3 .+ a
+    -- print $ a .+ n
+    -- print $ a .- n
+    -- print $ a .* n
+    -- print $ a ./ n
+    -- let n = 2.0 :: Double
+    -- let a = (from 5)  :: Vector
+    -- let b = (vec 1 2 3) :: Vector
+    -- print $ a + b
+    -- print $ a - b
+    -- print $ a * b
+    -- print $ a .+ n
+    -- print $ a .- n
+    -- print $ a .* n
+    -- print $ a ./ n
     print "DONE"
 
 createImage :: Int -> Int -> [Double] -> Image
@@ -80,7 +90,7 @@ createImage width height randList = Image {
             i <- [0..width - 1]
             let rands = take samplePerPixels randList
             let color = foldr (+) (toVec 0 0 0) $ fmap (randomRayColor i j world) rands
-            return $ fromVec $ apply (/fromIntegral samplePerPixels) color
+            return $ fromVec $ color ./ fromIntegral samplePerPixels
     }
         where
             randomRayColor i j world rand = fromColor $ rayColor (ray camera u v) world

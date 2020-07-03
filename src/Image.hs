@@ -19,12 +19,12 @@ color (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
 
 toColor :: FractionalColor -> Color
 toColor = fmap (floor . (255.99 *))
- 
+
 fromColor :: Color -> Vec3
 fromColor = fmap fromIntegral
 
 fromVec :: Vec3 -> Color
-fromVec = fmap floor  
+fromVec = fmap floor
 
 data Image = Image {
         width  :: Int,
@@ -34,12 +34,12 @@ data Image = Image {
 
 rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ do
                                                 (HitRecord _ normal _ _ ) <- h
-                                                return $ apply (*0.5) $ apply (+1) normal
+                                                return $ (normal .+ 1) .* 0.5
     where
         h = hit world ray 0 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
-        default_color = apply (*(1.0 - t)) (toVec 1 1 1) + apply (*t) (toVec 0.5 0.7 1.0)
+        default_color = toVec 1 1 1 .* (1.0 - t) + toVec 0.5 0.7 1.0 .* t
 
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0

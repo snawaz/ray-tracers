@@ -5,6 +5,7 @@ module Camera where
 
 import           Ray
 import           Vec
+import           BaseVec
 
 aspectRatio = 16.0 / 9.0;
 viewportHeight = 2.0
@@ -23,7 +24,7 @@ camera = Camera { origin, lowerLeftCorner, horizontal, vertical }
         origin = toVec 0 0 0
         horizontal = toVec viewportWidth 0 0
         vertical = toVec 0 viewportHeight 0
-        lowerLeftCorner = origin - (apply (/2) horizontal) - (apply (/2) vertical) - toVec 0 0 focalLength
+        lowerLeftCorner = origin - horizontal ./ 2 - vertical ./ 2 - toVec 0 0 focalLength
 
 ray Camera{origin, lowerLeftCorner, horizontal, vertical} u v =
-    Ray origin (lowerLeftCorner + (apply (*u) horizontal) + (apply (*v) vertical) - origin)
+    Ray origin (lowerLeftCorner + horizontal .* u + vertical .* v - origin)

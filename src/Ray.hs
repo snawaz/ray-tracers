@@ -2,6 +2,7 @@
 module Ray where
 
 import           Vec
+import           BaseVec
 
 data Ray = Ray Point3 Vec3
 
@@ -9,4 +10,4 @@ data Ray = Ray Point3 Vec3
 --
 -- direction (Ray _ vector) = vector
 
-pointAt (Ray origin direction) t = origin + apply (*t) direction
+pointAt (Ray origin direction) t = origin + direction .* t

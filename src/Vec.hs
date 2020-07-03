@@ -42,12 +42,10 @@ toVec = vec
 -- dot :: Vec3 -> Vec3 -> Double
 -- dot v1 v2 = sum $ zipWith (*) (toList v1) (toList v2)
 
-apply = fmap
-
 len2 :: Vec3 -> Double
 len2 v = dot v v
 
 len :: Vec3 -> Double
 len = sqrt . len2
 
-unit v = apply (/ len v) v
+unit v = v ./ len v

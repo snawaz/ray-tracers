@@ -30,7 +30,7 @@ instance Hittable Sphere where
                     r = do
                         t <- find (\t -> t < tmax && t > tmin) ts
                         let point = pointAt ray t
-                        let outward_normal = apply (/radius) (point - center)
+                        let outward_normal = (point - center) ./ radius
                         let front_face = dot direction outward_normal < 0
                         let normal = if front_face then outward_normal else -outward_normal
                         return $ HitRecord point normal t front_face

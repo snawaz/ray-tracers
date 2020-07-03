@@ -7,6 +7,7 @@
 {-# LANGUAGE IncoherentInstances #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TypeSynonymInstances  #-}
+{-# LANGUAGE FunctionalDependencies  #-}
 
 module BaseVec where
 
@@ -42,43 +43,90 @@ x (BaseVec [x', _, _]) = x'
 y (BaseVec [_, y', _]) = y'
 z (BaseVec [_, _, z']) = z'
 
-type Kolor  = BaseVec Int
+type Kolor  = BaseVec Integer
 type Vector = BaseVec Double
 
 dot :: Num a => BaseVec a -> BaseVec a -> a
 dot (BaseVec v1) (BaseVec v2) = sum $ zipWith (*) v1 v2
 
-class BinaryOperation a b where
-    type Result a b
-    (<.*>) :: a -> b -> Result a b
-    (<.+>) :: a -> b -> Result a b
-    (<.->) :: a -> b -> Result a b
-    (<./>) :: a -> b -> Result a b
+-- https://bugfactory.io/blog/custom-infix-operators-in-haskell/
+-- https://www.haskell.org/onlinereport/decls.html#fixity
 
-instance BinaryOperation (BaseVec Int) Int where
-    type Result (BaseVec Int) Int = BaseVec Int
-    (<.*>) v x = fmap (*x) v
-    (<.+>) v x = fmap (+x) v
-    (<.->) v x = fmap (`subtract` x) v
-    (<./>) v x = fmap (`div` x) v
+infixl 6 .+
+(.+) :: (Num a) => BaseVec a -> a -> BaseVec a
+(.+) v x = fmap (+x) v
 
-instance BinaryOperation Int (BaseVec Int) where
-    type Result Int (BaseVec Int) = BaseVec Int
-    (<.*>) x v = fmap (*x) v
-    (<.+>) x v = fmap (+x) v
-    (<.->) x v = fmap (x-) v
-    (<./>) x v = fmap (x `div`) v
+infixl 6 .-
+(.-) :: (Num a) => BaseVec a -> a -> BaseVec a
+(.-) v x = fmap (`subtract` x) v
 
-instance BinaryOperation (BaseVec Double) Double where
-    type Result (BaseVec Double) Double = BaseVec Double
-    (<.*>) v x = fmap (*x) v
-    (<.+>) v x = fmap (+x) v
-    (<.->) v x = fmap (`subtract` x) v
-    (<./>) v x = fmap (/x) v
+infixl 7 .*
+(.*) :: (Num a) => BaseVec a -> a -> BaseVec a
+(.*) v x = fmap (*x) v
 
-instance BinaryOperation Double (BaseVec Double) where
-    type Result Double (BaseVec Double) = BaseVec Double
-    (<.*>) x v = fmap (*x) v
-    (<.+>) x v = fmap (+x) v
-    (<.->) x v = fmap (x-) v
-    (<./>) x v = fmap (x/) v
+infixl 7 ./
+(./) :: (Fractional a) => BaseVec a -> a -> BaseVec a
+(./) v x = fmap (/x) v
+
+-- class ScalarOps a where
+--     data MyVec a :: *
+--     (.+) :: a -> b -> c
+--
+-- instance (Num a) => ScalarOps (BaseVec a) a (BaseVec a) where
+--     (.+) v x = fmap (+x) v
+--
+-- instance (Num a) => ScalarOps a (BaseVec a) (BaseVec a) where
+--     (.+) x v = fmap (x+) v
+
+-- class ScalarOps a b c | c -> a where
+--     (.+) :: a -> b -> c
+--
+-- instance (Num a) => ScalarOps (BaseVec a) a (BaseVec a) where
+--     (.+) v x = fmap (+x) v
+--
+-- instance (Num a) => ScalarOps a (BaseVec a) (BaseVec a) where
+--     (.+) x v = fmap (x+) v
+
+-- class ScalarOps a b c | a b -> c where
+--     (.+) :: a -> b -> c
+--
+-- instance (Num a) => ScalarOps (BaseVec a) a (BaseVec a) where
+--     (.+) v x = fmap (+x) v
+--
+-- instance (Num a) => ScalarOps a (BaseVec a) (BaseVec a) where
+--     (.+) x v = fmap (x+) v
+
+-- class BinaryOperation a b where
+--     type Result a b
+--     (.*) :: a -> b -> Result a b
+--     (.+) :: a -> b -> Result a b
+--     (.-) :: a -> b -> Result a b
+--     (./) :: a -> b -> Result a b
+--
+-- instance BinaryOperation (BaseVec Int) Int where
+--     type Result (BaseVec Int) Int = BaseVec Int
+--     (.*) v x = fmap (*x) v
+--     (.+) v x = fmap (+x) v
+--     (.-) v x = fmap (`subtract` x) v
+--     (./) v x = fmap (`div` x) v
+--
+-- instance BinaryOperation Int (BaseVec Int) where
+--     type Result Int (BaseVec Int) = BaseVec Int
+--     (.*) x v = fmap (*x) v
+--     (.+) x v = fmap (+x) v
+--     (.-) x v = fmap (x-) v
+--     (./) x v = fmap (x `div`) v
+--
+-- instance BinaryOperation (BaseVec Double) Double where
+--     type Result (BaseVec Double) Double = BaseVec Double
+--     (.*) v x = fmap (*x) v
+--     (.+) v x = fmap (+x) v
+--     (.-) v x = fmap (`subtract` x) v
+--     (./) v x = fmap (/x) v
+--
+-- instance BinaryOperation Double (BaseVec Double) where
+--     type Result Double (BaseVec Double) = BaseVec Double
+--     (.*) x v = fmap (*x) v
+--     (.+) x v = fmap (+x) v
+--     (.-) x v = fmap (x-) v
+--     (./) x v = fmap (x/) v
