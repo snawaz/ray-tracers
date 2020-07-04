@@ -20,25 +20,16 @@ import           Vec
 data Image = Image {
         width  :: Int,
         height :: Int,
-        pixels :: [[Color]]
+        pixels :: [Color]
     } deriving (Show)
 
 randomFraction :: (RandomGen g) => g -> (Double, g)
 randomFraction g = randomR (0, 1) g
 
-build :: ((a -> [a] -> [a]) -> [a] -> [a]) -> [a]
-build g = g (:) []
-
-chunksOf :: Int -> [e] -> [[e]]
-chunksOf i ls = map (take i) (build (splitter ls)) where
-  splitter :: [e] -> ([e] -> a -> a) -> a -> a
-  splitter [] _ n = n
-  splitter l c n  = l `c` splitter (drop i l) c n
-
-createImage' :: (Hittable a) => Int -> Int -> Int -> [Double] -> a -> Image
-createImage' width height samplePerPixels randList world = Image width height (chunksOf width pixels)
+createImage :: (Hittable a) => Int -> Int -> Int -> a -> Image
+createImage width height samplePerPixels world = Image width height pixels 
     where
-        coordinates = (,) <$> reverse [0..height-1] <*> [0..width-1]
+        coordinates = (,) <$> [0..height-1] <*> [0..width-1] -- no need to reverse y axis, as it'll be reversed by fold
         (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors, g) (j, i) = (color:colors, g')
             where
@@ -52,32 +43,15 @@ createImage' width height samplePerPixels randList world = Image width height (c
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
                         c = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
 
-createImage :: (Hittable a) => Int -> Int -> Int -> [Double] -> a -> Image
-createImage width height samplePerPixels randList world = Image width height pixels
-    where
-        pixels = do
-            j <- reverse [0..height - 1]
-            return $ do
-                i <- [0..width - 1]
-                let rands = take samplePerPixels randList
-                let sampledColor = foldr (+) (SampledColor(samplePerPixels, vec 0 0 0)) $ fmap (randomRayColor i j world) rands
-                return $ toColor sampledColor
-        randomRayColor i j world rand = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
-            where
-                u = (fromIntegral i + rand) / fromIntegral (width - 1)
-                v = (fromIntegral j + rand) / fromIntegral (height - 1)
-
 writeImage :: (Hittable a) => Int -> Int -> a -> IO ()
 writeImage imageWidth samplePerPixels world = do
-    let gen = mkStdGen 22
-    let randList = (randomRs (0,1) gen) :: [Double]
-    let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) samplePerPixels randList world
+    let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) samplePerPixels world
     let fmtColor (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
 
     putStrLn "P3"
     putStrLn $ show (width image) ++ " " ++ show (height image)
     print 255
-    putStrLn $ unlines [ intercalate "    " [fmtColor c | c <- row] | row <- pixels image]
+    putStrLn $ intercalate "\n" $ fmap fmtColor (pixels image)
 
 rayColor :: (Hittable a) => Ray -> a -> Color
 rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ do

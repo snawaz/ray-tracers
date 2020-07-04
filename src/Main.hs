@@ -23,6 +23,6 @@ main :: IO ()
 main = do
     -- writeImage 1800
     -- writeImage 800
-    -- writeImage 84 samplePerPixels world
-    writeImage 384 100 world
+    -- writeImage 384 samplePerPixels world
+    writeImage 200 40 world
     --writeImage 4 samplePerPixels world
