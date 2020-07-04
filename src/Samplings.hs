@@ -66,7 +66,10 @@ sampleUnitVector g = (vec (r * cos a) (r * sin a) z, g2)
         r = sqrt (1 - z * z)
 
 
-
+samplePointInHemisphere :: RandomGen g => g -> Double -> Vec3 -> (Point3, g)
+samplePointInHemisphere g radius normal = if dot p normal > 0.0 then (p, g1) else (-p, g1)
+    where
+        (p, g1) = samplePointInCircle g radius
 
 -- samplePointInCircle :: RandomGen g => g -> Double -> (Point3, g)
 -- samplePointInCircle g radius = (head points, g')
