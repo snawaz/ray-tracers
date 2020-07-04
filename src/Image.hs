@@ -55,14 +55,14 @@ writeImage imageWidth samplePerPixels world = do
 rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> (ColorVec, g)
 rayColor ray@(Ray origin direction) world g depth = if depth <= 0 then (zero, g) else computeColor 
     where
-        h = hit world ray 0 100000000000
+        h = hit world ray 0.001 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         default_color = vec 1 1 1 .* (1.0 - t) + vec 0.5 0.7 1.0 .* t
         computeColor = fromMaybe (default_color, g) $ do
                                                 (HitRecord p normal _ _ ) <- h
-                                                let (pointInUnitCircle, g1) = samplePointInCircle g 1
-                                                let target = p + normal + pointInUnitCircle
+                                                let (sampled, g1) = sampleUnitVector g
+                                                let target = p + normal + sampled
                                                 let newRay = Ray p (target - p)
                                                 let (newColor, g2) = rayColor newRay world g1 (depth - 1)
                                                 return $ (newColor .* 0.5, g2)
