@@ -8,11 +8,13 @@
 
 module Main where
 
+import           System.Random
+
 import           BaseVec
 import           Hittable
 import           Image
+import           Samplings
 
-samplePerPixels = 4
 
 world = HittableList [
         (Sphere (vec 0 0 (-1)) 0.5),
@@ -21,8 +23,19 @@ world = HittableList [
 
 main :: IO ()
 main = do
+    saveImage 
+    -- testCode
+
+testCode = do
+    let g = mkStdGen 22
+    print "test Code"
+    print $ samplePointInCircle g 1
+
+saveImage = do
     -- writeImage 1800
     -- writeImage 800
-    -- writeImage 384 samplePerPixels world
-    writeImage 200 40 world
-    --writeImage 4 samplePerPixels world
+    -- writeImage 384 100 world
+    writeImage 254 20 world
+    -- writeImage 100 10 world
+    -- writeImage 20 5 world
+    -- writeImage 4 samplePerPixels world

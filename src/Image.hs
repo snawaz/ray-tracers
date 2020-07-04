@@ -16,15 +16,13 @@ import           Hittable
 import           Ray
 import           Utils
 import           Vec
+import           Samplings
 
 data Image = Image {
         width  :: Int,
         height :: Int,
         pixels :: [Color]
     } deriving (Show)
-
-randomFraction :: (RandomGen g) => g -> (Double, g)
-randomFraction g = randomR (0, 1) g
 
 createImage :: (Hittable a) => Int -> Int -> Int -> a -> Image
 createImage width height samplePerPixels world = Image width height pixels 
@@ -33,15 +31,16 @@ createImage width height samplePerPixels world = Image width height pixels
         (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors, g) (j, i) = (color:colors, g')
             where
-                (sampleColors, g') = foldl' randomRayColor ([], g) [1..samplePerPixels]
+                (sampleColors, g') = foldl' sampleRayColor ([], g) [1..samplePerPixels]
                 color = toColor $ foldl' (+) (SampledColor(samplePerPixels, vec 0 0 0)) sampleColors
-                randomRayColor (colors, g) _ = (c:colors, g2)
+                sampleRayColor (colors, g) _ = (c:colors, g3)
                     where
-                        (r1, g1) = randomFraction g
-                        (r2, g2) = randomFraction g1
+                        (r1, g1) = sampleFraction g
+                        (r2, g2) = sampleFraction g1
                         u = (fromIntegral i + r1) / fromIntegral (width - 1)
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
-                        c = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
+                        (color, g3) = rayColor (ray camera u v) world g2 50
+                        c = toSampledColor samplePerPixels color
 
 writeImage :: (Hittable a) => Int -> Int -> a -> IO ()
 writeImage imageWidth samplePerPixels world = do
@@ -53,15 +52,20 @@ writeImage imageWidth samplePerPixels world = do
     print 255
     putStrLn $ intercalate "\n" $ fmap fmtColor (pixels image)
 
-rayColor :: (Hittable a) => Ray -> a -> Color
-rayColor ray@(Ray origin direction) world = toColor $ fromMaybe default_color $ do
-                                                (HitRecord _ normal _ _ ) <- h
-                                                return $ (normal .+ 1) .* 0.5
+rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> (ColorVec, g)
+rayColor ray@(Ray origin direction) world g depth = if depth <= 0 then (zero, g) else computeColor 
     where
         h = hit world ray 0 100000000000
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         default_color = vec 1 1 1 .* (1.0 - t) + vec 0.5 0.7 1.0 .* t
+        computeColor = fromMaybe (default_color, g) $ do
+                                                (HitRecord p normal _ _ ) <- h
+                                                let (pointInUnitCircle, g1) = samplePointInCircle g 1
+                                                let target = p + normal + pointInUnitCircle
+                                                let newRay = Ray p (target - p)
+                                                let (newColor, g2) = rayColor newRay world g1 (depth - 1)
+                                                return $ (newColor .* 0.5, g2)
 
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0

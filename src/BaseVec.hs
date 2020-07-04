@@ -36,9 +36,14 @@ vec x y z = BaseVec [x, y, z]
 
 from :: (Num a) => a -> BaseVec a
 from n = vec n n n
+
+zero :: (Num a) => BaseVec a
 zero = from 0
+
+one :: (Num a) => BaseVec a
 one = from 1
 
+x, y, z :: BaseVec Double -> Double
 x (BaseVec [x', _, _]) = x'
 y (BaseVec [_, y', _]) = y'
 z (BaseVec [_, _, z']) = z'
