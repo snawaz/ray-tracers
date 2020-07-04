@@ -1,8 +1,8 @@
 
 all:
 	rm -f image.ppm
-	cabal v2-build
-	./ray-tracers >> image.ppm
+	cabal v2-build -O2
+	 ./ray-tracers >> image.ppm
 	open image.ppm
 
 build:

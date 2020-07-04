@@ -3,7 +3,7 @@
 
 module Image where
 
-import           Data.List     (intercalate)
+import           Data.List     (intercalate, foldl')
 import           Data.Maybe
 import           System.IO     (IOMode (WriteMode), hFlush, hPutStrLn, withFile)
 import           System.Random
@@ -22,6 +22,35 @@ data Image = Image {
         height :: Int,
         pixels :: [[Color]]
     } deriving (Show)
+
+randomFraction :: (RandomGen g) => g -> (Double, g)
+randomFraction g = randomR (0, 1) g
+
+build :: ((a -> [a] -> [a]) -> [a] -> [a]) -> [a]
+build g = g (:) []
+
+chunksOf :: Int -> [e] -> [[e]]
+chunksOf i ls = map (take i) (build (splitter ls)) where
+  splitter :: [e] -> ([e] -> a -> a) -> a -> a
+  splitter [] _ n = n
+  splitter l c n  = l `c` splitter (drop i l) c n
+
+createImage' :: (Hittable a) => Int -> Int -> Int -> [Double] -> a -> Image
+createImage' width height samplePerPixels randList world = Image width height (chunksOf width pixels)
+    where
+        coordinates = (,) <$> reverse [0..height-1] <*> [0..width-1]
+        (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
+        computeColor (colors, g) (j, i) = (color:colors, g')
+            where
+                (sampleColors, g') = foldl' randomRayColor ([], g) [1..samplePerPixels]
+                color = toColor $ foldl' (+) (SampledColor(samplePerPixels, vec 0 0 0)) sampleColors
+                randomRayColor (colors, g) _ = (c:colors, g2)
+                    where
+                        (r1, g1) = randomFraction g
+                        (r2, g2) = randomFraction g1
+                        u = (fromIntegral i + r1) / fromIntegral (width - 1)
+                        v = (fromIntegral j + r2) / fromIntegral (height - 1)
+                        c = toSampledColor samplePerPixels $ rayColor (ray camera u v) world
 
 createImage :: (Hittable a) => Int -> Int -> Int -> [Double] -> a -> Image
 createImage width height samplePerPixels randList world = Image width height pixels

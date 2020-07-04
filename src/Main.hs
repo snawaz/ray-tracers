@@ -12,7 +12,7 @@ import           BaseVec
 import           Hittable
 import           Image
 
-samplePerPixels = 100
+samplePerPixels = 4
 
 world = HittableList [
         (Sphere (vec 0 0 (-1)) 0.5),
@@ -23,4 +23,6 @@ main :: IO ()
 main = do
     -- writeImage 1800
     -- writeImage 800
-    writeImage 384 samplePerPixels world
+    -- writeImage 84 samplePerPixels world
+    writeImage 384 100 world
+    --writeImage 4 samplePerPixels world
