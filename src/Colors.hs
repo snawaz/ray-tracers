@@ -30,7 +30,7 @@ class ToColor a where
 
 instance ToColor SampledColor where
     -- toColor (SampledColor(n, v)) = fmap floor $ v ./ fromIntegral n
-    toColor (SampledColor(n, v)) = fmap (floor . (255.99*)) $ v ./ fromIntegral n
+    toColor (SampledColor(n, v)) = fmap (floor . (255.99*) . sqrt) $ v ./ fromIntegral n
 
 toSampledColor :: Int -> ColorVec -> SampledColor
 toSampledColor n color = SampledColor(n, color)
