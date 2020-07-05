@@ -12,8 +12,9 @@ import Samplings
 
 --randomScene :: Hittable a => Int -> HittableList a
 randomScene :: Int -> HittableList Sphere
-randomScene seed = HittableList $ randomObjects ++ fixedObjects 
+randomScene seed = HittableList $ [groundObject] ++ randomObjects ++ fixedObjects
     where
+        groundObject = Sphere (vec 0 (-1000) 0) 1000 (Material (Lambertian (from 0.5)))
         randomObjects = fst $ foldl' mkObject ([], mkStdGen seed) $ (,) <$> [-11..11] <*> [-11..11]
         mkObject (objects, g) (a, b) = (fromMaybe objects (fmap (\o-> o:objects) object), g2)
             where
@@ -26,7 +27,7 @@ randomScene seed = HittableList $ randomObjects ++ fixedObjects
                         (d1, g'') = sampleFraction g'
                         mat = if chooseMat < 0.8
                                  then Material $ Lambertian (p1 * p2)
-                                 else if chooseMat < 0.95 
+                                 else if chooseMat < 0.95
                                     then Material $ Metal (fmap (\i -> 0.5 + 0.5 * i) p1) (0.5 * d1)
                                     else Material $ Dielectric 1.5
                         obj = Sphere center 0.2 mat
