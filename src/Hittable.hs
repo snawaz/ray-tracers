@@ -73,7 +73,7 @@ class Scatterable a where
 
 data Lambertian = Lambertian ColorVec
 data Metal = Metal ColorVec Double
-data Dielectric = Dielectric
+data Dielectric = Dielectric Double
 
 instance Scatterable Lambertian where
     scatter (Lambertian color) _ray (HitRecord p normal _ _ _) g = (Just (scattered, color), g1)
@@ -91,9 +91,17 @@ instance Scatterable Metal where
             reflected = reflect (unit direction) normal
             scattered = Ray p (reflected + sampled .* (min fuzz 1.0))
 
---
--- instance Scatterable Dielectric where
---     scatter m r h = undefined
---
--- testMaterials :: [Material]
--- testMaterials = [Material Lambertian, Material Metal, Material Dielectric]
+refract :: Vec3 -> Vec3 -> Double -> Vec3
+refract uv n etai_over_etat = r_out_perp + r_out_perp
+    where
+        cos_theta = dot (-uv) n
+        r_out_parallel = (uv + n .* cos_theta) .* etai_over_etat
+        r_out_perp = negate $ n .* sqrt (1.0 - len2 r_out_parallel)
+
+instance Scatterable Dielectric where
+    scatter (Dielectric refIdx) (Ray _ direction) rec g = (Just (scattered, attenuation), g)
+        where
+            attenuation = one
+            etai_over_etat = if front_face rec then 1.0 / refIdx else refIdx
+            refracted = refract (unit direction) (normal rec) etai_over_etat
+            scattered = Ray (p rec) refracted
