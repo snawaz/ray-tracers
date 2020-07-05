@@ -13,6 +13,7 @@ module BaseVec where
 
 import           Prelude hiding ()
 import qualified Prelude as P
+import Control.DeepSeq
 
 import           Utils
 
@@ -27,6 +28,9 @@ instance Num a => Num (BaseVec a) where
     abs v = fmap abs v
     signum v = fmap signum v
     fromInteger n = BaseVec $ replicate arity (fromInteger n)
+
+instance NFData a => NFData (BaseVec a) where
+    rnf (BaseVec xs) = rnf xs
 
 vec :: (Num a) => a -> a -> a -> BaseVec a
 vec x y z = BaseVec [x, y, z]

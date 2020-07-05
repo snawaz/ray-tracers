@@ -4,6 +4,8 @@
 
 module Colors where
 
+import Control.DeepSeq
+
 import           BaseVec
 
 type Color = BaseVec Int
@@ -20,6 +22,9 @@ instance Num SampledColor where
     signum (SampledColor(n, v)) = SampledColor(n, signum v)
     fromInteger n = SampledColor(fromInteger n, fromInteger 0)
 
+instance NFData SampledColor where
+    rnf (SampledColor(n, v)) = rnf n `seq` rnf v
+
 class ToColor a where
     toColor :: a -> Color
 
@@ -27,7 +32,7 @@ clamp :: Ord a => a -> a -> a -> a
 clamp lo hi val = min hi (max lo val)
 
 instance ToColor SampledColor where
-    toColor (SampledColor(n, v)) = fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
+    toColor (SampledColor(n, v)) = force $ fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
 
 toSampledColor :: Int -> ColorVec -> SampledColor
 toSampledColor n color = SampledColor(n, color)
