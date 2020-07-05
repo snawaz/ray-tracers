@@ -28,7 +28,7 @@ data Image = Image {
 createImage :: (Hittable a) => Int -> Int -> Int -> a -> Image
 createImage width height samplePerPixels world = Image width height pixels
     where
-        cam = camera 90.0 aspectRatio
+        cam = camera (vec (-2) 2 1) (vec 0 0 (-1)) (vec 0 1 0) 90.0 aspectRatio
         coordinates = (,) <$> [0..height-1] <*> [0..width-1] -- no need to reverse y axis, as it'll be reversed by fold
         (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors, g) (j, i) = (color:colors, g')
