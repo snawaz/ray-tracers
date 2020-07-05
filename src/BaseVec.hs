@@ -22,10 +22,7 @@ data BaseVec a = BaseVec [a] deriving(Show, Functor)
 
 instance Num a => Num (BaseVec a) where
     BaseVec v1 + BaseVec v2 = BaseVec $ zipWith (+) v1 v2
-    BaseVec v1 * BaseVec v2 = BaseVec $ zipWith (-) a b
-        where
-            a = zipWith (*) (rotate 1 v1) (rotate 2 v2)
-            b = zipWith (*) (rotate 2 v1) (rotate 1 v2)
+    BaseVec v1 * BaseVec v2 = BaseVec $ zipWith (*) v1 v2
     BaseVec v1 - BaseVec v2 = BaseVec $ zipWith (-) v1 v2
     abs v = fmap abs v
     signum v = fmap signum v
@@ -50,6 +47,12 @@ z (BaseVec [_, _, z']) = z'
 
 dot :: Num a => BaseVec a -> BaseVec a -> a
 dot (BaseVec v1) (BaseVec v2) = sum $ zipWith (*) v1 v2
+
+cross :: Num a => BaseVec a -> BaseVec a -> BaseVec a
+cross (BaseVec v1) (BaseVec v2) = BaseVec $ zipWith (-) a b
+    where
+        a = zipWith (*) (rotate 1 v1) (rotate 2 v2)
+        b = zipWith (*) (rotate 2 v1) (rotate 1 v2)
 
 -- https://bugfactory.io/blog/custom-infix-operators-in-haskell/
 -- https://www.haskell.org/onlinereport/decls.html#fixity

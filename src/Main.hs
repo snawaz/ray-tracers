@@ -17,8 +17,10 @@ import           Samplings
 
 
 world = HittableList [
-        (Sphere (vec 0 0 (-1)) 0.5),
-        (Sphere (vec 0 (-100.5) (-1)) 100)
+        (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.7 0.3 0.3)))),
+        (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
+        (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2)))),
+        (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8))))
     ]
 
 main :: IO ()
@@ -35,7 +37,7 @@ saveImage = do
     -- writeImage 1800
     -- writeImage 800
     -- writeImage 384 100 world
-    writeImage 254 20 world
+    writeImage 204 40 world
     -- writeImage 100 10 world
     -- writeImage 20 5 world
     -- writeImage 4 samplePerPixels world

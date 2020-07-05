@@ -8,8 +8,6 @@ import           BaseVec
 
 type Color = BaseVec Int
 
--- type FractionalColor = BaseVec Double
-
 type ColorVec = BaseVec Double
 
 newtype SampledColor = SampledColor (Int, BaseVec Double)
@@ -25,12 +23,11 @@ instance Num SampledColor where
 class ToColor a where
     toColor :: a -> Color
 
--- instance ToColor FractionalColor where
---    toColor = fmap (floor . (255.99 *))
+clamp :: Ord a => a -> a -> a -> a
+clamp lo hi val = min hi (max lo val)
 
 instance ToColor SampledColor where
-    -- toColor (SampledColor(n, v)) = fmap floor $ v ./ fromIntegral n
-    toColor (SampledColor(n, v)) = fmap (floor . (255.99*) . sqrt) $ v ./ fromIntegral n
+    toColor (SampledColor(n, v)) = fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
 
 toSampledColor :: Int -> ColorVec -> SampledColor
 toSampledColor n color = SampledColor(n, color)
