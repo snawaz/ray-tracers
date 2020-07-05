@@ -28,6 +28,7 @@ data Image = Image {
 createImage :: (Hittable a) => Int -> Int -> Int -> a -> Image
 createImage width height samplePerPixels world = Image width height pixels
     where
+        cam = camera 90.0 aspectRatio
         coordinates = (,) <$> [0..height-1] <*> [0..width-1] -- no need to reverse y axis, as it'll be reversed by fold
         (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors, g) (j, i) = (color:colors, g')
@@ -40,7 +41,7 @@ createImage width height samplePerPixels world = Image width height pixels
                         (r2, g2) = sampleFraction g1
                         u = (fromIntegral i + r1) / fromIntegral (width - 1)
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
-                        (color, g3) = rayColor (ray camera u v) world g2 50
+                        (color, g3) = rayColor (ray cam u v) world g2 50
                         c = toSampledColor samplePerPixels color
 
 writeImage :: (Hittable a) => Int -> Int -> a -> IO ()
