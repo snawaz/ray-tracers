@@ -56,9 +56,9 @@ samplePointInSphere g radius = fromJust (find g)
         maybePoint g = (maybeP, g')
             where
                 (p, g') = samplePointBetween g (-radius) radius
-                maybeP = if (len2 p) >= radius then Just p else Nothing
+                maybeP = if (len2 p) < radius then Just p else Nothing
 
-sampleUnitVector :: RandomGen g => g -> (Point3, g)
+sampleUnitVector :: RandomGen g => g -> (Vec3, g)
 sampleUnitVector g = (vec (r * cos a) (r * sin a) z, g2)
     where
         (a, g1) = sampleBetween g 0 (2 * pi)
@@ -70,6 +70,23 @@ samplePointInHemisphere :: RandomGen g => g -> Double -> Vec3 -> (Point3, g)
 samplePointInHemisphere g radius normal = if dot p normal > 0.0 then (p, g1) else (-p, g1)
     where
         (p, g1) = samplePointInSphere g radius
+
+sampleVecInUnitDisk :: RandomGen g => g -> (Vec3, g)
+sampleVecInUnitDisk g = fromJust (find g)
+    where
+        find g = p
+            where
+                (maybeV, g') = maybeVec g
+                p = if isJust maybeV
+                       then Just (fromJust maybeV, g')
+                        else find g'
+
+        maybeVec g = (maybeV, g2)
+            where
+                (x, g1) = sampleBetween g (-1) 1
+                (y, g2) = sampleBetween g1 (-1) 1
+                v = vec x y 0
+                maybeV = if (len2 v) < 1.0 then Just v else Nothing
 
 -- class Sampling sampler where
 --     -- type SamplerMonad sampler :: * -> *
