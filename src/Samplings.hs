@@ -43,8 +43,8 @@ samplePointBetween g a b = (BaseVec xy, g')
     where
         (xy, g') = sampleBetweens g a b 3 -- TODO : 2 causes Non-exhaustive patterns in function y
 
-samplePointInCircle :: RandomGen g => g -> Double -> (Point3, g)
-samplePointInCircle g radius = fromJust (find g)
+samplePointInSphere :: RandomGen g => g -> Double -> (Point3, g)
+samplePointInSphere g radius = fromJust (find g)
     where
         find g = p
             where
@@ -69,17 +69,7 @@ sampleUnitVector g = (vec (r * cos a) (r * sin a) z, g2)
 samplePointInHemisphere :: RandomGen g => g -> Double -> Vec3 -> (Point3, g)
 samplePointInHemisphere g radius normal = if dot p normal > 0.0 then (p, g1) else (-p, g1)
     where
-        (p, g1) = samplePointInCircle g radius
-
--- samplePointInCircle :: RandomGen g => g -> Double -> (Point3, g)
--- samplePointInCircle g radius = (head points, g')
---     where
---         (points, g') = foldl makeCircle ([], g) [0..]
---         makeCircle (circles, g) _ = (fromMaybe circles (fmap (:circles) c), g')
---             where
---                 (p, g') = samplePointBetween g (-radius) radius
---                 c = if (len2 p) >= radius then Just p else Nothing
---
+        (p, g1) = samplePointInSphere g radius
 
 -- class Sampling sampler where
 --     -- type SamplerMonad sampler :: * -> *

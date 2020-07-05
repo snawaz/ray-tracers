@@ -19,8 +19,8 @@ import           Samplings
 world = HittableList [
         (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.7 0.3 0.3)))),
         (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
-        (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2)))),
-        (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8))))
+        (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.5))),
+        (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8) 0.5)))
     ]
 
 main :: IO ()
@@ -31,7 +31,6 @@ main = do
 testCode = do
     let g = mkStdGen 22
     print "test Code"
-    print $ samplePointInCircle g 1
 
 saveImage = do
     -- writeImage 1800
