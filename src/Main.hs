@@ -42,7 +42,7 @@ saveImage = do
     -- writeImage 800
     -- writeImage 384 100 world
     -- writeImage 204 40 world
-    writeImage 150 50 (randomScene 23) 40
+    writeImage 100 20 (randomScene 23) 20
     -- writeImage 100 10 world
     -- writeImage 20 5 world
     -- writeImage 4 samplePerPixels world
