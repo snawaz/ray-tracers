@@ -98,14 +98,21 @@ refract uv n etai_over_etat = r_out_perp + r_out_perp
         r_out_parallel = (uv + n .* cos_theta) .* etai_over_etat
         r_out_perp = negate $ n .* sqrt (1.0 - len2 r_out_parallel)
 
+schlick :: Double -> Double -> Double
+schlick cosine refIdx = r0 + (1 - r0) * (1-cosine) ^ 5
+    where
+        r0 = ((1-refIdx) / (1+refIdx)) ^ 2
+
 instance Scatterable Dielectric where
-    scatter (Dielectric refIdx) (Ray _ direction) rec g = (Just (scattered, attenuation), g)
+    scatter (Dielectric refIdx) (Ray _ direction) rec g = (Just (scattered, attenuation), g1)
         where
             attenuation = one
             etai_over_etat = if front_face rec then 1.0 / refIdx else refIdx
             cos_theta = min (dot (negate $ unit direction) (normal rec)) 1.0
             sin_theta = sqrt (1.0 - cos_theta * cos_theta)
-            scatter_direction = if etai_over_etat * sin_theta > 1.0
+            reflect_probability = schlick cos_theta etai_over_etat
+            (sampled, g1) = sampleFraction g
+            scatter_direction = if etai_over_etat * sin_theta > 1.0 || reflect_probability > sampled
                                    then reflect (unit direction) (normal rec)
                                    else refract (unit direction) (normal rec) etai_over_etat
             scattered = Ray (p rec) scatter_direction
