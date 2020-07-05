@@ -14,7 +14,7 @@ import           BaseVec
 import           Hittable
 import           Image
 import           Samplings
-
+import           Scenes
 
 r = cos (pi/4)
 world = HittableList [
@@ -37,10 +37,12 @@ testCode = do
     print "test Code"
 
 saveImage = do
+    --print $ randomScene 22
     -- writeImage 1800
     -- writeImage 800
     -- writeImage 384 100 world
-    writeImage 204 40 world
+    -- writeImage 204 40 world
+    writeImage 150 50 (randomScene 23) 40
     -- writeImage 100 10 world
     -- writeImage 20 5 world
     -- writeImage 4 samplePerPixels world

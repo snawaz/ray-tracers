@@ -34,14 +34,21 @@ sampleBetweens g min max n = (fmap (\r -> min + r * (max - min)) xs, g')
         (xs, g') = sampleFractions g n
 
 samplePoint :: RandomGen g => g -> (Point3, g)
-samplePoint g = (BaseVec xy, g')
+samplePoint g = (BaseVec xyz, g')
     where
-        (xy, g') = sampleFractions g 3  -- TODO Non-exhaustive patterns in function y
+        (xyz, g') = sampleFractions g 3  -- TODO Non-exhaustive patterns in function y
+
+samplePoints :: RandomGen g => g -> Int -> ([Point3], g)
+samplePoints g n = foldl' gen ([], g) [1..n]
+    where
+        gen (xs, g) _ = (x:xs, g')
+            where
+                (x, g') = samplePoint g
 
 samplePointBetween :: RandomGen g => g -> Double -> Double -> (Point3, g)
-samplePointBetween g a b = (BaseVec xy, g')
+samplePointBetween g a b = (BaseVec xyz, g')
     where
-        (xy, g') = sampleBetweens g a b 3 -- TODO : 2 causes Non-exhaustive patterns in function y
+        (xyz, g') = sampleBetweens g a b 3 -- TODO : 2 causes Non-exhaustive patterns in function y
 
 samplePointInSphere :: RandomGen g => g -> Double -> (Point3, g)
 samplePointInSphere g radius = fromJust (find g)

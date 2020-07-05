@@ -25,14 +25,14 @@ data Image = Image {
         pixels :: [Color]
     } deriving (Show)
 
-createImage :: (Hittable a) => Int -> Int -> Int -> a -> Image
-createImage width height samplePerPixels world = Image width height pixels
+createImage :: (Hittable a) => Int -> Int -> Int -> a -> Int -> Image
+createImage width height samplePerPixels world depth = Image width height pixels
     where
-        lookFrom = vec 3 3 2
-        lookAt = vec 0 0 (-1)
+        lookFrom = vec 13 2 3
+        lookAt = vec 0 0 0
         viewUp = vec 0 1 0
-        focusDistance = len $ lookFrom - lookAt
-        aperture = 2.0
+        focusDistance = 10.0 -- len $ lookFrom - lookAt
+        aperture = 0.1 --2.0
         cam = camera lookFrom lookAt viewUp 20.0 aspectRatio aperture focusDistance
         coordinates = (,) <$> [0..height-1] <*> reverse [0..width-1] -- no need to reverse y axis, as it'll be reversed by fold
         (pixels, _) = foldl' computeColor ([], mkStdGen 22) coordinates
@@ -47,12 +47,12 @@ createImage width height samplePerPixels world = Image width height pixels
                         u = (fromIntegral i + r1) / fromIntegral (width - 1)
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
                         (ray, g3) = getRay cam u v g2
-                        (color, g4) = rayColor ray world g3 50
+                        (color, g4) = rayColor ray world g3 depth
                         c = toSampledColor samplePerPixels color
 
-writeImage :: (Hittable a) => Int -> Int -> a -> IO ()
-writeImage imageWidth samplePerPixels world = do
-    let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) samplePerPixels world
+writeImage :: (Hittable a) => Int -> Int -> a -> Int -> IO ()
+writeImage imageWidth samplePerPixels world depth = do
+    let image = createImage imageWidth (floor (fromIntegral imageWidth / aspectRatio)) samplePerPixels world depth
     let fmtColor (BaseVec [r,g,b]) = printf "%3d %3d %3d\n" r g b
 
     putStrLn "P3"
