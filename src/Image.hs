@@ -1,5 +1,6 @@
 
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE BangPatterns #-}
 
 module Image where
 
@@ -57,26 +58,27 @@ createImage width height samplePerPixels world depth = Image width height (pixel
                         u = (fromIntegral i + r1) / fromIntegral (width - 1)
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
                         (ray, g3) = getRay cam u v g2
-                        (color, g4) = rayColor ray world g3 depth
+                        (color, g4) = rayColor ray world g3 depth one
                         c = toSampledColor samplePerPixels color
 
-rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> (ColorVec, g)
-rayColor ray@(Ray origin direction) world g depth = if depth <= 0 then (force zero, g) else computeColor
+rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> ColorVec -> (ColorVec, g)
+rayColor ray@(Ray origin direction) world g depth !acc = if depth <= 0 then (force zero, g) else computeColor
 --rayColor ray@(Ray origin direction) world g depth = if depth <= 0 then (zero, g) else computeColor
     where
         h = hit world ray 0.001 maxValue
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         default_color = one .* (1.0 - t) + vec 0.5 0.7 1.0 .* t
-        computeColor = fromMaybe (force default_color, g) $ do
+        computeColor = fromMaybe (force $ default_color * acc, g) $ do
         --computeColor = fromMaybe (default_color, g) $ do
                                                 rec@(HitRecord p normal (Material m) _ _ ) <- h
                                                 let (maybeScattered, g1) = scatter m ray rec g
                                                 return $ fromMaybe (force zero, g1) $ do
                                                 --return $ fromMaybe (zero, g1) $ do
                                                                 (scattered, attenuation) <- maybeScattered
-                                                                let (c, g2) = rayColor scattered world g1 (depth - 1)
-                                                                return (force $ attenuation * c, g2)
+                                                                return $ rayColor scattered world g1 (depth - 1) (acc * attenuation)
+                                                                -- let (c, g2) = rayColor scattered world g1 (depth - 1)
+                                                                -- return (force $ attenuation * c, g2)
                                                                 -- return (attenuation * c, g2)
 
 writeImage :: (Hittable a) => Int -> Int -> a -> Int -> IO ()
@@ -84,7 +86,8 @@ writeImage imageWidth samplePerPixels world depth = do
     let imageHeight = floor $ fromIntegral imageWidth / aspectRatio
     let image = createImage imageWidth imageHeight samplePerPixels world depth
     let fmtColor (BaseVec r g b) = printf "%3d %3d %3d" r g b
-    let filename seconds = printf "images/%dx%d-%d-%d-%dm-%ds-%d.ppm" imageWidth imageHeight samplePerPixels depth (seconds `div` 60) (seconds `mod` 60) seconds
+    now <- getSecondsNow
+    let filename seconds = printf "images/%dx%d-%d-%d-%dm-%ds-%d.ppm" imageWidth imageHeight samplePerPixels depth (seconds `div` 60) (seconds `mod` 60) now
     -- colors <- evaluate $ force $ (pixels image) `using` parListChunk 32 rseq
     -- let colors = pixels image
 
