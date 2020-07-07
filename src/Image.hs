@@ -37,6 +37,9 @@ createImage :: (Hittable a) => Int -> Int -> Int -> a -> Int -> Image
 createImage width height samplePerPixels world depth = Image width height (pixels)
     where
         lookFrom = vec 13 2 3
+        -- lookFrom = vec 13 8 3 -- from top
+        -- lookFrom = vec 13 1 3 -- from slightly down
+        -- lookFrom = vec 8 2 3 --- from nearer, same angle
         lookAt = vec 0 0 0
         viewUp = vec 0 1 0
         focusDistance = 10.0 -- len $ lookFrom - lookAt
