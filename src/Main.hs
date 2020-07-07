@@ -9,12 +9,14 @@
 module Main where
 
 import           System.Random
+import           System.Environment
 
 import           BaseVec
 import           Hittable
 import           Image
 import           Samplings
 import           Scenes
+import           Utils
 
 r = cos (pi/4)
 world = HittableList [
@@ -29,18 +31,17 @@ world = HittableList [
 
 main :: IO ()
 main = do
-    saveImage
-    -- testCode
+    args <- getArgs
+    let [width, samplePerPixels, depth] = fmap read args
+    saveImage width samplePerPixels depth
 
-testCode = do
-    let g = mkStdGen 22
-    print "test Code"
-
-saveImage = do
-    --print $ randomScene 22
+saveImage :: Int -> Int -> Int -> IO ()
+saveImage width samplePerPixels depth = do
     -- writeImage 1800
-    -- writeImage 800
     -- writeImage 384 100 world
-    -- writeImage 100 20 (randomScene 23) 20
+    (elapsed, _) <- getSecondsElapsed $ writeImage width samplePerPixels (randomScene 23) depth
+    putStrLn $ "\n TOTAL TIME ELAPSED: " ++ show (elapsed)
     -- writeImage 200 100 (randomScene 23) 50
-    writeImage 384 100 (randomScene 23) 50
+    -- writeImage 384 100 (randomScene 23) 50
+    -- writeImage 800 100 (randomScene 23) 50
+    -- writeImage 1200 100 (randomScene 23) 50

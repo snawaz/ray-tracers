@@ -61,6 +61,7 @@ haskellPackages.shellFor {
     pkgs.zlib # required on fish
     hie
     haskellPackages.stylish-haskell
+    # haskellPackages.threadscope
   ]; 
   shellHook = ''
     alias ls="ls --color"
