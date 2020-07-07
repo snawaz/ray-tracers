@@ -1,4 +1,3 @@
-
 {-# LANGUAGE AllowAmbiguousTypes    #-}
 {-# LANGUAGE DeriveFunctor          #-}
 {-# LANGUAGE FlexibleInstances      #-}
@@ -19,21 +18,25 @@ import           Utils
 
 arity = 3
 
-data BaseVec a = BaseVec [a] deriving(Show, Functor)
+data BaseVec a = BaseVec {
+    x :: !a,
+    y :: !a,
+    z :: !a
+} deriving(Show, Functor)
 
 instance Num a => Num (BaseVec a) where
-    BaseVec v1 + BaseVec v2 = BaseVec $ zipWith (+) v1 v2
-    BaseVec v1 * BaseVec v2 = BaseVec $ zipWith (*) v1 v2
-    BaseVec v1 - BaseVec v2 = BaseVec $ zipWith (-) v1 v2
+    BaseVec x1 y1 z1 + BaseVec x2 y2 z2 = BaseVec (x1 + x2) (y1 + y2) (z1 + z2)
+    BaseVec x1 y1 z1 - BaseVec x2 y2 z2 = BaseVec (x1 - x2) (y1 - y2) (z1 - z2)
+    BaseVec x1 y1 z1 * BaseVec x2 y2 z2 = BaseVec (x1 * x2) (y1 * y2) (z1 * z2)
     abs v = fmap abs v
     signum v = fmap signum v
-    fromInteger n = BaseVec $ replicate arity (fromInteger n)
+    fromInteger n = from (fromInteger n)
 
 instance NFData a => NFData (BaseVec a) where
-    rnf (BaseVec xs) = rnf xs
+    rnf (BaseVec x y z) = rnf x `seq` rnf y `seq` rnf z
 
 vec :: (Num a) => a -> a -> a -> BaseVec a
-vec x y z = BaseVec [x, y, z]
+vec x y z = BaseVec x y z
 
 from :: (Num a) => a -> BaseVec a
 from n = vec n n n
@@ -44,19 +47,20 @@ zero = from 0
 one :: (Num a) => BaseVec a
 one = from 1
 
-x, y, z :: BaseVec Double -> Double
-x (BaseVec [x', _, _]) = x'
-y (BaseVec [_, y', _]) = y'
-z (BaseVec [_, _, z']) = z'
+-- x, y, z :: BaseVec Double -> Double
+-- x (BaseVec [x', _, _]) = x'
+-- y (BaseVec [_, y', _]) = y'
+-- z (BaseVec [_, _, z']) = z'
 
 dot :: Num a => BaseVec a -> BaseVec a -> a
-dot (BaseVec v1) (BaseVec v2) = sum $ zipWith (*) v1 v2
+dot (BaseVec x1 y1 z1) (BaseVec x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 cross :: Num a => BaseVec a -> BaseVec a -> BaseVec a
-cross (BaseVec v1) (BaseVec v2) = BaseVec $ zipWith (-) a b
+cross (BaseVec x1 y1 z1) (BaseVec x2 y2 z2) = BaseVec x y z
     where
-        a = zipWith (*) (rotate 1 v1) (rotate 2 v2)
-        b = zipWith (*) (rotate 2 v1) (rotate 1 v2)
+        x = y1 * z2 - z1 * y2
+        y = z1 * x2 - x1 * z2
+        z = x1 * y2 - y1 * x2
 
 -- https://bugfactory.io/blog/custom-infix-operators-in-haskell/
 -- https://www.haskell.org/onlinereport/decls.html#fixity

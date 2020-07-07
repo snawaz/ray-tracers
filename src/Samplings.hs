@@ -34,7 +34,7 @@ sampleBetweens g min max n = (fmap (\r -> min + r * (max - min)) xs, g')
         (xs, g') = sampleFractions g n
 
 samplePoint :: RandomGen g => g -> (Point3, g)
-samplePoint g = (BaseVec xyz, g')
+samplePoint g = (BaseVec (xyz !! 0) (xyz !! 1) (xyz !! 2), g')
     where
         (xyz, g') = sampleFractions g 3  -- TODO Non-exhaustive patterns in function y
 
@@ -46,7 +46,7 @@ samplePoints g n = foldl' gen ([], g) [1..n]
                 (x, g') = samplePoint g
 
 samplePointBetween :: RandomGen g => g -> Double -> Double -> (Point3, g)
-samplePointBetween g a b = (BaseVec xyz, g')
+samplePointBetween g a b = (BaseVec (xyz !! 0) (xyz !! 1) (xyz !! 2), g')
     where
         (xyz, g') = sampleBetweens g a b 3 -- TODO : 2 causes Non-exhaustive patterns in function y
 

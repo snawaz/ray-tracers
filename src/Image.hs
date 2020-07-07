@@ -83,8 +83,8 @@ writeImage :: (Hittable a) => Int -> Int -> a -> Int -> IO ()
 writeImage imageWidth samplePerPixels world depth = do
     let imageHeight = floor $ fromIntegral imageWidth / aspectRatio
     let image = createImage imageWidth imageHeight samplePerPixels world depth
-    let fmtColor (BaseVec [r,g,b]) = printf "%3d %3d %3d" r g b
-    let filename seconds = printf "images/%dx%d-%d-%d-%dm-%ds.ppm" imageWidth imageHeight samplePerPixels depth (seconds `div` 60) (seconds `mod` 60)
+    let fmtColor (BaseVec r g b) = printf "%3d %3d %3d" r g b
+    let filename seconds = printf "images/%dx%d-%d-%d-%dm-%ds-%d.ppm" imageWidth imageHeight samplePerPixels depth (seconds `div` 60) (seconds `mod` 60) seconds
     -- colors <- evaluate $ force $ (pixels image) `using` parListChunk 32 rseq
     -- let colors = pixels image
 
