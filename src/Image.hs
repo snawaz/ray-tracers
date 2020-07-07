@@ -47,11 +47,9 @@ createImage width height samplePerPixels world depth = Image width height (pixel
         computeColor (j, i) = color
             where
                 g = mkStdGen (i * width + j)
-                (sampleColors, g') = foldl' sampleRayColor ([], g) [1..samplePerPixels]
-                color = force $ toColor $ foldl' (+) (SampledColor(samplePerPixels, vec 0 0 0)) (force sampleColors)
-                --color = toColor $ foldl' (+) (SampledColor(samplePerPixels, vec 0 0 0)) sampleColors
-                sampleRayColor (colors, g) _ = (force $ c:colors, g4)  -- THIS SEEMS to reduce GC time from 27s -> 2s for 100/100/50
-                -- sampleRayColor (colors, g) _ = (c:colors, g4)
+                (sampleColor, g') = foldl' sampleRayColor (SampledColor(samplePerPixels, zero), g) [1..samplePerPixels]
+                color = force $ toColor sampleColor
+                sampleRayColor (acc, g) _ = (force $ c + acc, g4)
                     where
                         (r1, g1) = sampleFraction g
                         (r2, g2) = sampleFraction g1
