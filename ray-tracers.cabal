@@ -22,8 +22,10 @@ executable ray-tracers
                        Utils
                        Ray
                        Hittable
+                       Camera
   build-depends:       base >=4.12 && <4.13,
-                       numeric-limits >= 0.1.0
+                       numeric-limits >= 0.1.0,
+                       random >=1.0 && <1.1
   hs-source-dirs:      src
   ghc-options:         -O2
                        -Wall 
