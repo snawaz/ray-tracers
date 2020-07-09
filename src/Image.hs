@@ -13,7 +13,7 @@ import           Colors         (Color, ColorVec, SampledColor (SampledColor), t
 import           Hittable       (HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian), Material (Material),
                                  Metal (Metal), Sphere (Sphere), scatter)
 import           Ray            (Ray (Ray))
-import           Samplings      (sampleFraction, samplePointInHemisphere)
+import           Samplings      (sampleFraction)
 import           Vec            (one, unit, vec, yCoor, zero, (.*))
 
 data Image = Image {
@@ -31,8 +31,8 @@ createImage width height = Image width height colors
         world = HittableList [
                 (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.7 0.3 0.3)))),
                 (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
-                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2)))),
-                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8))))
+                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.5))),
+                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8) 0.5)))
             ]
         samplePerPixels = 100
         depth = 50
@@ -67,7 +67,7 @@ rayColor ray@(Ray _origin direction) world g depth =if depth <= 0 then (zero, g)
         t = 0.5 * (yCoor (unit direction) + 1.0)
         default_color = one .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
         computeColor = fromMaybe (default_color, g) $ do
-                                                record@(HitRecord p normal (Material m) _ _ ) <- h
+                                                record@(HitRecord _ _ (Material m) _ _ ) <- h
                                                 let (maybeScattered, g1) = scatter m ray record g
                                                 return $ fromMaybe (zero, g1) $ do
                                                                 (scatteredRay, attenuation) <- maybeScattered

@@ -19,7 +19,7 @@ import           System.Random (RandomGen)
 
 import           Colors        (ColorVec)
 import           Ray           (Ray (Ray), pointAt)
-import           Samplings     (sampleUnitVector)
+import           Samplings     (samplePointInSphere, sampleUnitVector)
 import           Vec           (Point3, Vec3, dot, lenSquared, unit, (.*), (./))
 
 
@@ -82,7 +82,7 @@ class Scatterable a where
     scatter :: RandomGen g => a -> Ray -> HitRecord -> g -> (Maybe (Ray, ColorVec), g)
 
 data Lambertian = Lambertian ColorVec
-data Metal = Metal ColorVec
+data Metal = Metal ColorVec Double
 data Dielectric = Dielectric
 
 instance Scatterable Lambertian where
@@ -93,10 +93,11 @@ instance Scatterable Lambertian where
             scattered = Ray p scatter_direction
 
 instance Scatterable Metal where
-    scatter (Metal color) (Ray _ direction) (HitRecord p normal _ _ _) _g = if dot reflected normal > 0
-                                                                              then (Just (scattered, color), _g)
-                                                                              else (Nothing, _g)
+    scatter (Metal color fuzz) (Ray _ direction) (HitRecord p normal _ _ _) g = if dot reflected normal > 0
+                                                                              then (Just (scattered, color), g1)
+                                                                              else (Nothing, g1)
         where
+            (sampled, g1) = samplePointInSphere g 1
             reflected = reflect (unit direction) normal
-            scattered = Ray p reflected
+            scattered = Ray p (reflected + sampled .* (min fuzz 1.0))
 
