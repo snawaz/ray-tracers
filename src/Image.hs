@@ -62,10 +62,10 @@ rayColor (Ray origin direction) = toColor $ if h > 0.0
 hitSphere :: Point3 -> Double -> Ray -> Double
 hitSphere center radius (Ray origin direction) = if discriminant < 0
                                                     then -1.0
-                                                    else (-b - sqrt discriminant) / (2 * a)
+                                                    else (-half_b - sqrt discriminant) / a
     where
         oc = origin - center
         a = lenSquared direction
-        b = 2.0 * dot oc direction
+        half_b = dot oc direction
         c = lenSquared oc - radius^2
-        discriminant = b^2 - 4*a*c
+        discriminant = half_b^2 - 4*a*c
