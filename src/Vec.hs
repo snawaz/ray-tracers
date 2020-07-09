@@ -7,7 +7,8 @@ module Vec(
     xCoor, yCoor, zCoor,
     dot, cross, unit,
     (.+), (.-), (.*), (./),
-    Point3, Vec3
+    Point3, Vec3,
+    len, lenSquared
 )where
 
 import           Utils (rotate)
