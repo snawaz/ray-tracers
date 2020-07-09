@@ -39,5 +39,5 @@ clamp lo hi val = min hi (max lo val)
 instance ToColor SampledColor where
     toColor (SampledColor(n, v)) = Color(xs !! 0, xs !! 1, xs !! 2)
          where
-             (Vec xs) = fmap (floor . (256.0*) . clamp 0.0 0.999) $ v ./ fromIntegral n
+             (Vec xs) = fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
 
