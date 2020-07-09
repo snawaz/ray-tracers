@@ -5,7 +5,7 @@ module Image(
 
 import           Data.List (intercalate)
 
-import           Colors    (Color (Color))
+import           Colors    (Color, toColor)
 
 data Image = Image {
         imageWidth  :: Int,
@@ -18,12 +18,7 @@ createImage width height = Image width height colors
     where
         colors = do
                 j <- reverse [0..height-1]
-                let makeColor i' j' = Color(r, g, b)
-                        where
-                            r = floor $ 255.99 * fromIntegral i' / fromIntegral (width - 1)
-                            g = floor $ 255.99 * fromIntegral j' / fromIntegral (height - 1)
-                            b = floor $ 255.99 * 0.25
-                return [makeColor i j | i <- [0..width-1]]
+                return [toColor i j width height | i <- [0..width-1]]
 
 writeImage :: IO ()
 writeImage = do
