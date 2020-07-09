@@ -18,6 +18,8 @@ executable ray-tracers
   main-is:             Main.hs
   other-modules:       Image
                        Colors
+                       Vec
+                       Utils
   build-depends:       base >=4.12 && <4.13
   hs-source-dirs:      src
   ghc-options:         -O2
