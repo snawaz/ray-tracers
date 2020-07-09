@@ -21,7 +21,7 @@ class Hittable a where
 data Sphere = Sphere Point3 Double
 
 instance Hittable Sphere where
-    hit (Sphere center radius) (Ray origin direction) tmin tmax = record
+    hit (Sphere center radius) ray@(Ray origin direction) tmin tmax = record
         where
             oc = origin - center
             a = lenSquared direction
@@ -33,7 +33,7 @@ instance Hittable Sphere where
                     ts = [(-half_b - root)/a, (-half_b + root)/a]
                     r = do
                         t <- find (\t -> t < tmax && t > tmin) ts
-                        let point = pointAt (Ray origin direction) t
+                        let point = pointAt ray t
                         let outward_normal = (point - center) ./ radius
                         let front_face = dot direction outward_normal < 0
                         let normal = if front_face then outward_normal else -outward_normal
