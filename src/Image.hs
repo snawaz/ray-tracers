@@ -13,7 +13,7 @@ import Numeric.Limits(maxValue)
 import Control.DeepSeq
 import Control.Exception (evaluate)
 import Control.Parallel
-import Control.Parallel.Strategies (using, rpar, rseq, rdeepseq, parListChunk)
+import Control.Parallel.Strategies (using, rpar, rseq, rdeepseq, parBuffer, parListChunk)
 import           Data.Time.Clock.System
 import           System.IO                  (IOMode (WriteMode),  withFile, hPutStrLn)
 import           System.Directory (renameFile)
@@ -46,13 +46,16 @@ createImage width height samplePerPixels world depth = Image width height (pixel
         aperture = 0.1 --2.0
         cam = camera lookFrom lookAt viewUp 20.0 aspectRatio aperture focusDistance
         coordinates = (,) <$> reverse [0..height-1] <*> [0..width-1]
-        pixels = force map computeColor coordinates `using` parListChunk 32 rseq
+        -- pixels = force map computeColor coordinates 
+        pixels = force map computeColor coordinates `using` parListChunk 128 rseq -- 32 causes overflowed for 1200 100 60 !! HAHA
         computeColor (j, i) = color
             where
                 g = mkStdGen (i * width + j)
-                (sampleColor, g') = foldl' sampleRayColor (SampledColor(samplePerPixels, zero), g) [1..samplePerPixels]
+                -- (sampleColor, g') = foldl' sampleRayColor (SampledColor(samplePerPixels, zero), g) [1..samplePerPixels]
+                (sampleColor, g') = loop sampleRayColor (SampledColor(samplePerPixels, zero), g) samplePerPixels
                 color = force $ toColor sampleColor
-                sampleRayColor (acc, g) _ = (force $ c + acc, g4)
+                --sampleRayColor (acc, g) _ = (force $ c + acc, g4)
+                sampleRayColor (acc, g) = (force $ c + acc, g4)
                     where
                         (r1, g1) = sampleFraction g
                         (r2, g2) = sampleFraction g1
@@ -62,11 +65,19 @@ createImage width height samplePerPixels world depth = Image width height (pixel
                         (color, g4) = rayColor ray world g3 depth one
                         c = toSampledColor samplePerPixels color
 
+-- https://gitlab.haskell.org/ghc/ghc/-/issues/8763
+{-# INLINE loop #-}
+loop :: (a -> a) -> a -> Int -> a  
+loop f v n = go 0 v
+  where
+      go !i arg | i == n = arg
+                | otherwise = go (i+1) (f arg)
+
 rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> ColorVec -> (ColorVec, g)
 rayColor ray@(Ray origin direction) world g depth !acc = if depth <= 0 then (force zero, g) else computeColor
 --rayColor ray@(Ray origin direction) world g depth = if depth <= 0 then (zero, g) else computeColor
     where
-        h = hit world ray 0.001 maxValue
+        h = hit_world world ray 0.001 maxValue
         unit_direction = unit direction
         t = 0.5 * (y (unit direction) + 1.0)
         default_color = one .* (1.0 - t) + vec 0.5 0.7 1.0 .* t
@@ -74,7 +85,7 @@ rayColor ray@(Ray origin direction) world g depth !acc = if depth <= 0 then (for
         --computeColor = fromMaybe (default_color, g) $ do
                                                 rec@(HitRecord p normal (Material m) _ _ ) <- h
                                                 let (maybeScattered, g1) = scatter m ray rec g
-                                                return $ fromMaybe (force zero, g1) $ do
+                                                return $! fromMaybe (force zero, g1) $ do
                                                 --return $ fromMaybe (zero, g1) $ do
                                                                 (scattered, attenuation) <- maybeScattered
                                                                 return $ rayColor scattered world g1 (depth - 1) (acc * attenuation)

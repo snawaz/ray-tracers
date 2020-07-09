@@ -7,16 +7,41 @@
 {-# LANGUAGE OverloadedStrings      #-}
 {-# LANGUAGE TypeFamilies           #-}
 {-# LANGUAGE TypeSynonymInstances   #-}
+-- {-# LANGUAGE BangPatterns #-}
+-- {-# LANGUAGE MagicHash, UnboxedTuples #-}
 
 module BaseVec where
 
 import           Prelude hiding ()
 import qualified Prelude as P
 import Control.DeepSeq
-
 import           Utils
+import GHC.Prim -- http://hackage.haskell.org/package/ghc-prim-0.6.1/docs/GHC-Prim.html
 
 arity = 3
+
+data MyV = MyV {
+    x' :: {-# UNPACK #-} !Double,
+    y' :: {-# UNPACK #-} !Double,
+    z' :: {-# UNPACK #-} !Double
+    -- x' :: Double#,
+    -- y' :: Double#,
+    -- z' :: Double#
+} deriving(Show)
+
+instance Num MyV where
+    {-# INLINE (+) #-}
+    MyV x1 y1 z1 + MyV x2 y2 z2 = MyV (x1 + x2) (y1 + y2) (z1 + z2)
+    {-# INLINE (-) #-}
+    MyV x1 y1 z1 - MyV x2 y2 z2 = MyV (x1 - x2) (y1 - y2) (z1 - z2)
+    {-# INLINE (*) #-}
+    MyV x1 y1 z1 * MyV x2 y2 z2 = MyV (x1 * x2) (y1 * y2) (z1 * z2)
+    abs v = undefined-- fmap abs v
+    signum v = undefined -- fmap signum v
+    fromInteger n = undefined -- from (fromInteger n)
+
+instance NFData MyV  where
+    rnf (MyV x y z) = rnf x `seq` rnf y `seq` rnf z
 
 data BaseVec a = BaseVec {
     x :: !a,
@@ -24,9 +49,13 @@ data BaseVec a = BaseVec {
     z :: !a
 } deriving(Show, Functor)
 
-instance Num a => Num (BaseVec a) where
+-- instance Num a => Num (BaseVec a) where
+instance Num (BaseVec Double) where
+    {-# INLINE (+) #-}
     BaseVec x1 y1 z1 + BaseVec x2 y2 z2 = BaseVec (x1 + x2) (y1 + y2) (z1 + z2)
+    {-# INLINE (-) #-}
     BaseVec x1 y1 z1 - BaseVec x2 y2 z2 = BaseVec (x1 - x2) (y1 - y2) (z1 - z2)
+    {-# INLINE (*) #-}
     BaseVec x1 y1 z1 * BaseVec x2 y2 z2 = BaseVec (x1 * x2) (y1 * y2) (z1 * z2)
     abs v = fmap abs v
     signum v = fmap signum v
@@ -52,9 +81,12 @@ one = from 1
 -- y (BaseVec [_, y', _]) = y'
 -- z (BaseVec [_, _, z']) = z'
 
-dot :: Num a => BaseVec a -> BaseVec a -> a
+-- ot :: Num a => BaseVec a -> BaseVec a -> a
+--dot :: BaseVec Double -> BaseVec Double -> Double
+{-# INLINE dot #-}
 dot (BaseVec x1 y1 z1) (BaseVec x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
+{-# INLINE cross #-}
 cross :: Num a => BaseVec a -> BaseVec a -> BaseVec a
 cross (BaseVec x1 y1 z1) (BaseVec x2 y2 z2) = BaseVec x y z
     where

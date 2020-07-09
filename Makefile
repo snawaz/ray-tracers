@@ -1,6 +1,7 @@
 
 build:
-	cabal v2-build -O2
+	# cabal v2-build -O2  --enable-profiling  --enable-executable-profiling
+	cabal v2-build -O2 
 
 test:
 	cabal v2-build -O2

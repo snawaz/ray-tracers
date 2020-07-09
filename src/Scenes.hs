@@ -4,6 +4,8 @@ module Scenes where
 import System.Random
 import           Data.Maybe (fromMaybe)
 import           Data.List     (foldl')
+-- import Data.Array.Unboxed
+import Data.Array
 
 import Hittable
 import Vec
@@ -12,8 +14,9 @@ import Samplings
 
 --randomScene :: Hittable a => Int -> HittableList a
 randomScene :: Int -> HittableList Sphere
-randomScene seed = HittableList $ [groundObject] ++ randomObjects ++ fixedObjects
+randomScene seed = HittableList $ toHittableList allObjects -- listArray (1, length allObjects) allObjects
     where
+        allObjects = [groundObject] ++ randomObjects ++ fixedObjects
         groundObject = Sphere (vec 0 (-1000) 0) 1000 (Material (Lambertian (from 0.5)))
         randomObjects = fst $ foldl' mkObject ([], mkStdGen seed) $ (,) <$> [-11..11] <*> [-11..11]
         mkObject (objects, g) (a, b) = (fromMaybe objects (fmap (\o-> o:objects) object), g2)
