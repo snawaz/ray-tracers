@@ -10,7 +10,7 @@ module Vec(
     Point3, Vec3
 )where
 
-import Utils (rotate)
+import           Utils (rotate)
 
 arity :: Int
 arity = 3
@@ -42,15 +42,15 @@ one = from 1
 
 xCoor :: Num a => Vec a -> a
 xCoor (Vec [x', _, _]) = x'
-xCoor _ = undefined
+xCoor _                = undefined
 
 yCoor :: Num a => Vec a -> a
 yCoor (Vec [_, y', _]) = y'
-yCoor _ = undefined
+yCoor _                = undefined
 
 zCoor :: Num a => Vec a -> a
 zCoor (Vec [_, _, z']) = z'
-zCoor _ = undefined
+zCoor _                = undefined
 
 dot :: Num a => Vec a -> Vec a -> a
 dot (Vec v1) (Vec v2) = sum $ zipWith (*) v1 v2
