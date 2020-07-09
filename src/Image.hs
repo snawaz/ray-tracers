@@ -6,9 +6,8 @@ module Image(
 import           Data.List (intercalate)
 
 import           Colors    (Color, toColor)
-import           Ray       (Ray (Ray))
-import           Vec       (Point3, dot, lenSquared, unit, vec, yCoor, (.*),
-                            (./))
+import           Ray       (Ray (Ray), pointAt)
+import           Vec       (Point3, dot, lenSquared, unit, vec, yCoor, (.*), (.+), (./))
 
 data Image = Image {
         imageWidth  :: Int,
@@ -50,17 +49,20 @@ writeImage = do
 
 
 rayColor :: Ray -> Color
-rayColor (Ray origin direction) = toColor $ if hitSphere (vec 0 0 (-1)) 0.5 (Ray origin direction)
-                                                then vec 1 0 0
+rayColor (Ray origin direction) = toColor $ if h > 0.0
+                                                then ((unit $ pointAt (Ray origin direction) h - vec 0 0 (-1)) .+ 1) .* 0.5
                                                 else p1 + p2
     where
+        h = hitSphere (vec 0 0 (-1)) 0.5 (Ray origin direction)
         t = 0.5 * (yCoor (unit direction) + 1.0)
         p1 = (vec 1 1 1) .* (1.0 -t)
         p2 = (vec 0.5 0.7 1.0) .* t
 
 
-hitSphere :: Point3 -> Double -> Ray -> Bool
-hitSphere center radius (Ray origin direction) = discriminant > 0
+hitSphere :: Point3 -> Double -> Ray -> Double
+hitSphere center radius (Ray origin direction) = if discriminant < 0
+                                                    then -1.0
+                                                    else (-b - sqrt discriminant) / (2 * a)
     where
         oc = origin - center
         a = lenSquared direction
