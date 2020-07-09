@@ -12,7 +12,7 @@ import           Camera         (camera, rayAt)
 import           Colors         (Color, ColorVec, SampledColor (SampledColor), toColor)
 import           Hittable       (HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Sphere (Sphere))
 import           Ray            (Ray (Ray))
-import           Samplings      (sampleFraction, sampleUnitVector)
+import           Samplings      (sampleFraction, samplePointInHemisphere)
 import           Vec            (unit, vec, yCoor, zero, (.*))
 
 data Image = Image {
@@ -65,8 +65,8 @@ rayColor ray@(Ray _origin direction) world g depth =if depth <= 0 then (zero, g)
         default_color = (vec 1 1 1) .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
         computeColor = fromMaybe (default_color, g) $ do
                                                 (HitRecord p normal _ _ ) <- h
-                                                let (sampled, g1) = sampleUnitVector g
-                                                let target = p + normal + sampled
+                                                let (sampled, g1) = samplePointInHemisphere g 1 normal
+                                                let target = p + sampled
                                                 let newRay = Ray p (target - p)
                                                 let (newColor, g2) = rayColor newRay world g1 (depth - 1)
                                                 return $ (newColor .* 0.5, g2)
