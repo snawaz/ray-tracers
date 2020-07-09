@@ -1,4 +1,7 @@
 
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+
 module Colors(
     Color,
     toColor
@@ -6,14 +9,19 @@ module Colors(
 
 import           Text.Printf (printf)
 
+import           Vec         (Point3, Vec (Vec))
+
 newtype Color = Color (Int, Int, Int)
 
 instance Show Color where
     show (Color(r,g,b)) = printf "%3d %3d %3d" r g b
 
-toColor :: Int -> Int -> Int ->Int -> Color
-toColor i j w h = Color(r, g, b)
-    where
-        r = floor $ 255.99 * fromIntegral i / fromIntegral (w - 1)
-        g = floor $ 255.99 * fromIntegral j / fromIntegral (h - 1)
-        b = floor $ 255.99 * 0.25
+class ToColor a where
+    toColor :: a -> Color
+
+instance ToColor Point3 where
+    toColor (Vec xs) = Color (r, g, b)
+        where
+            r = floor $ 255.99 * xs !! 0
+            g = floor $ 255.99 * xs !! 1
+            b = floor $ 255.99 * xs !! 2

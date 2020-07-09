@@ -2,8 +2,8 @@
 {-# LANGUAGE DeriveFunctor #-}
 
 module Vec(
-    Vec,
-    zero, one,
+    Vec (Vec),
+    zero, one, from ,vec,
     xCoor, yCoor, zCoor,
     dot, cross, unit,
     (.+), (.-), (.*), (./),
