@@ -10,10 +10,11 @@ import           System.Random  (RandomGen, mkStdGen)
 
 import           Camera         (camera, rayAt)
 import           Colors         (Color, ColorVec, SampledColor (SampledColor), toColor)
-import           Hittable       (HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Sphere (Sphere))
+import           Hittable       (HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian), Material (Material),
+                                 Metal (Metal), Sphere (Sphere), scatter)
 import           Ray            (Ray (Ray))
 import           Samplings      (sampleFraction, samplePointInHemisphere)
-import           Vec            (unit, vec, yCoor, zero, (.*))
+import           Vec            (one, unit, vec, yCoor, zero, (.*))
 
 data Image = Image {
         imageWidth  :: Int,
@@ -28,8 +29,10 @@ createImage :: Int -> Int -> Image
 createImage width height = Image width height colors
     where
         world = HittableList [
-                (Sphere (vec 0 0 (-1)) 0.5),
-                (Sphere (vec 0 (-100.5) (-1)) 100)
+                (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.7 0.3 0.3)))),
+                (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
+                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2)))),
+                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8))))
             ]
         samplePerPixels = 100
         depth = 50
@@ -62,11 +65,12 @@ rayColor ray@(Ray _origin direction) world g depth =if depth <= 0 then (zero, g)
     where
         h = hit world ray 0.001 maxValue
         t = 0.5 * (yCoor (unit direction) + 1.0)
-        default_color = (vec 1 1 1) .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
+        default_color = one .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
         computeColor = fromMaybe (default_color, g) $ do
-                                                (HitRecord p normal _ _ ) <- h
-                                                let (sampled, g1) = samplePointInHemisphere g 1 normal
-                                                let target = p + sampled
-                                                let newRay = Ray p (target - p)
-                                                let (newColor, g2) = rayColor newRay world g1 (depth - 1)
-                                                return $ (newColor .* 0.5, g2)
+                                                record@(HitRecord p normal (Material m) _ _ ) <- h
+                                                let (maybeScattered, g1) = scatter m ray record g
+                                                return $ fromMaybe (zero, g1) $ do
+                                                                (scatteredRay, attenuation) <- maybeScattered
+                                                                let (c, g2) = rayColor scatteredRay world g1 (depth - 1)
+                                                                return (attenuation * c, g2)
+
