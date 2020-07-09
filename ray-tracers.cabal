@@ -1,0 +1,27 @@
+cabal-version:       >=1.10
+
+name:                ray-tracers
+version:             0.1.0.0
+synopsis:
+description:
+bug-reports:
+license:
+license-file:        LICENSE
+author:              Sarfaraz Nawaz
+maintainer:          sarfaraz.nawaz@tenx.tech
+copyright:
+category:
+build-type:          Simple
+extra-source-files:
+
+executable ray-tracers
+  main-is:             Main.hs
+  other-modules:       Image
+                       Colors
+  build-depends:       base >=4.12 && <4.13
+  hs-source-dirs:      src
+  ghc-options:         -O2
+                       -Wall 
+                       -Werror=missing-import-lists -Werror=missing-export-lists
+                       -Wno-type-defaults 
+  default-language:    Haskell2010
