@@ -9,10 +9,10 @@ module Colors(
     toColor
 ) where
 
-import           Text.Printf (printf)
-import           Control.DeepSeq       (NFData, rnf)
+import           Control.DeepSeq (NFData, rnf)
+import           Text.Printf     (printf)
 
-import           Vec         (Vec (Vec), (./))
+import           Vec             (Vec (Vec), (./))
 
 newtype Color = Color (Int, Int, Int)
 

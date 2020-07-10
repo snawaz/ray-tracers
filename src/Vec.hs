@@ -11,9 +11,9 @@ module Vec(
     len, lenSquared
 )where
 
-import           Control.DeepSeq       (NFData, rnf)
+import           Control.DeepSeq (NFData, rnf)
 
-import           Utils (rotate)
+import           Utils           (rotate)
 
 arity :: Int
 arity = 3

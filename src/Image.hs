@@ -6,6 +6,7 @@ module Image(
     writeImage
 ) where
 
+import           Control.DeepSeq       (force)
 import           Data.List             (foldl')
 import           Data.Maybe            (fromMaybe)
 import           Numeric.Limits        (maxValue)
@@ -15,7 +16,6 @@ import           System.Directory      (createDirectoryIfMissing, renameFile)
 import           System.IO             (IOMode (WriteMode), hPutStrLn, withFile)
 import           System.Random         (RandomGen, mkStdGen)
 import           Text.Printf           (printf)
-import           Control.DeepSeq       (force)
 
 import           Camera                (camera, rayAt)
 import           Colors                (Color, ColorVec, SampledColor (SampledColor), toColor)
