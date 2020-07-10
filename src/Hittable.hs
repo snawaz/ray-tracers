@@ -20,7 +20,7 @@ import           System.Random (RandomGen)
 import           Colors        (ColorVec)
 import           Ray           (Ray (Ray), pointAt)
 import           Samplings     (samplePointInSphere, sampleUnitVector)
-import           Vec           (Point3, Vec3, dot, lenSquared, unit, (.*), (./), one, lenSquared)
+import           Vec           (Point3, Vec3, dot, lenSquared, one, unit, (.*), (./))
 
 
 data HitRecord = HitRecord {
@@ -113,5 +113,9 @@ instance Scatterable Dielectric where
         where
             attenuation = one
             etai_over_etat = if front_face rec then 1.0 / refIdx else refIdx
-            refracted = refract (unit direction) (normal rec) etai_over_etat
-            scattered = Ray (p rec) refracted
+            cos_theta = min (dot (negate $ unit direction) (normal rec)) 1.0
+            sin_theta = sqrt (1.0 - cos_theta * cos_theta)
+            scatter_direction = if etai_over_etat * sin_theta > 1.0
+                                   then reflect (unit direction) (normal rec)
+                                   else refract (unit direction) (normal rec) etai_over_etat
+            scattered = Ray (p rec) scatter_direction
