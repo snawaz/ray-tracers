@@ -31,9 +31,9 @@ createImage width height = Image width height colors
         world = HittableList [
                 (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.1 0.2 0.5)))),
                 (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
-                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.0))),
-                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Dielectric 1.5)))
-
+                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.3))),
+                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Dielectric 1.5))),
+                (Sphere (vec (-1) 0 (-1)) (-0.45) (Material (Dielectric 1.5)))
             ]
         samplePerPixels = 100
         depth = 50
