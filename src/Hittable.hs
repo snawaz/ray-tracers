@@ -19,7 +19,7 @@ import           System.Random (RandomGen)
 
 import           Colors        (ColorVec)
 import           Ray           (Ray (Ray), pointAt)
-import           Samplings     (samplePointInSphere, sampleUnitVector, sampleFraction)
+import           Samplings     (sampleFraction, samplePointInSphere, sampleUnitVector)
 import           Vec           (Point3, Vec3, dot, lenSquared, one, unit, (.*), (./))
 
 
