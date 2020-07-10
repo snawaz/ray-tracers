@@ -14,7 +14,7 @@ import           Hittable       (Dielectric (Dielectric), HitRecord (HitRecord),
                                  Material (Material), Metal (Metal), Sphere (Sphere), scatter)
 import           Ray            (Ray (Ray))
 import           Samplings      (sampleFraction)
-import           Vec            (one, unit, vec, yCoor, zero, (.*))
+import           Vec            (one, unit, vec, yCoor, zero, (.*), len)
 
 data Image = Image {
         imageWidth  :: Int,
@@ -37,20 +37,27 @@ createImage width height = Image width height colors
             ]
         samplePerPixels = 100
         depth = 50
-        cam = camera (vec (-2) 2 1) (vec 0 0 (-1)) (vec 0 1 0) 90.0 aspectRatio
+        cam = camera lookFrom lookAt viewUp 20.0 aspectRatio aperture focusDistance
+            where
+                lookFrom = vec 3 3 2
+                lookAt = vec 0 0 (-1)
+                viewUp = vec 0 1 0
+                focusDistance = len $ lookFrom - lookAt
+                aperture = 2.0
         coordinates = (,) <$> [0..height-1] <*> reverse [0..width-1]
         colors = fst $ foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors', g) (j, i) = (color:colors', g')
              where
                  (sampledColor, g') = foldl' sampledRayColor (SampledColor(samplePerPixels, zero), g) [1..samplePerPixels]
                  color = toColor sampledColor
-                 sampledRayColor (acc, g'') _ = (c + acc, g3)
+                 sampledRayColor (acc, g'') _ = (c + acc, g4)
                      where
                          (r1, g1) = sampleFraction g''
                          (r2, g2) = sampleFraction g1
                          u = (fromIntegral i + r1) / fromIntegral (width - 1)
                          v = (fromIntegral j + r2) / fromIntegral (height - 1)
-                         (colorVec, g3) = rayColor (rayAt cam u v) world g2 depth
+                         (ray, g3) = rayAt cam u v g2
+                         (colorVec, g4) = rayColor ray world g3 depth
                          c =  SampledColor(samplePerPixels, colorVec)
 
 writeImage :: IO ()
