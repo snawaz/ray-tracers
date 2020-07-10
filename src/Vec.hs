@@ -11,6 +11,8 @@ module Vec(
     len, lenSquared
 )where
 
+import           Control.DeepSeq       (NFData, rnf)
+
 import           Utils (rotate)
 
 arity :: Int
@@ -25,6 +27,9 @@ instance Num a => Num (Vec a) where
     abs (Vec v) = Vec $ fmap abs v
     signum (Vec v) = Vec $ fmap signum v
     fromInteger n = Vec $ replicate arity (fromInteger n)
+
+instance NFData a => NFData (Vec a) where
+    rnf (Vec xs) = rnf xs
 
 type Vec3 = Vec Double
 type Point3 = Vec Double

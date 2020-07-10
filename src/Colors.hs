@@ -10,6 +10,7 @@ module Colors(
 ) where
 
 import           Text.Printf (printf)
+import           Control.DeepSeq       (NFData, rnf)
 
 import           Vec         (Vec (Vec), (./))
 
@@ -25,6 +26,9 @@ instance Show Color where
 class ToColor a where
     toColor :: a -> Color
 
+instance NFData Color where
+    rnf (Color(r, g, b)) = rnf r `seq` rnf g `seq` rnf b
+
 instance Num SampledColor where
     (SampledColor(_, v1)) + (SampledColor (n, v2)) = SampledColor(n, v1 + v2)
     (SampledColor(_, v1)) * (SampledColor (n, v2)) = SampledColor(n, v1 * v2)
@@ -32,6 +36,9 @@ instance Num SampledColor where
     abs (SampledColor(n, v)) = SampledColor(n, abs v)
     signum (SampledColor(n, v)) = SampledColor(n, signum v)
     fromInteger n = SampledColor(fromInteger n, fromInteger 0)
+
+instance NFData SampledColor where
+    rnf (SampledColor(n, v)) = rnf n `seq` rnf v
 
 clamp :: Ord a => a -> a -> a -> a
 clamp lo hi val = min hi (max lo val)

@@ -30,9 +30,11 @@ executable ray-tracers
                        random >=1.0 && <1.1,
                        time >= 1.1,
                        directory >= 1.3,
-                       pretty-terminal >= 0.1.0
+                       pretty-terminal >= 0.1.0,
+                       deepseq >= 1.4.4.0
   hs-source-dirs:      src
   ghc-options:         -O2
+                       -rtsopts
                        -Wall 
                        -Werror=missing-import-lists -Werror=missing-export-lists
                        -Wno-type-defaults 
