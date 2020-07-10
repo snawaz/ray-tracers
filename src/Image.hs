@@ -10,8 +10,8 @@ import           System.Random  (RandomGen, mkStdGen)
 
 import           Camera         (camera, rayAt)
 import           Colors         (Color, ColorVec, SampledColor (SampledColor), toColor)
-import           Hittable       (Dielectric (Dielectric), HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian),
-                                 Material (Material), Metal (Metal), Sphere (Sphere), scatter)
+import           Hittable       ( HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian),
+                                 Material (Material), Sphere (Sphere), scatter)
 import           Ray            (Ray (Ray))
 import           Samplings      (sampleFraction)
 import           Vec            (one, unit, vec, yCoor, zero, (.*))
@@ -23,20 +23,19 @@ data Image = Image {
     } deriving (Show)
 
 aspectRatio :: Double
-aspectRatio = 16.0 / 9.0;
+aspectRatio = 16.0 / 9.0
 
 createImage :: Int -> Int -> Image
 createImage width height = Image width height colors
     where
+        r = cos (pi / 4)
         world = HittableList [
-                (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.1 0.2 0.5)))),
-                (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
-                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.3))),
-                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Dielectric 1.5))),
-                (Sphere (vec (-1) 0 (-1)) (-0.45) (Material (Dielectric 1.5)))
+                (Sphere (vec (-r) 0 (-1)) r (Material (Lambertian (vec 0 0 1)))),
+                (Sphere (vec r 0 (-1)) r (Material (Lambertian (vec 1 0 0))))
             ]
         samplePerPixels = 100
         depth = 50
+        cam = camera 90.0 aspectRatio
         coordinates = (,) <$> [0..height-1] <*> reverse [0..width-1]
         colors = fst $ foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors', g) (j, i) = (color:colors', g')
@@ -49,7 +48,7 @@ createImage width height = Image width height colors
                          (r2, g2) = sampleFraction g1
                          u = (fromIntegral i + r1) / fromIntegral (width - 1)
                          v = (fromIntegral j + r2) / fromIntegral (height - 1)
-                         (colorVec, g3) = rayColor (rayAt camera u v) world g2 depth
+                         (colorVec, g3) = rayColor (rayAt cam u v) world g2 depth
                          c =  SampledColor(samplePerPixels, colorVec)
 
 writeImage :: IO ()

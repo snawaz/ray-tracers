@@ -4,15 +4,11 @@
 module Camera(
     Camera(Camera),
     rayAt,
-    aspectRatio,
     camera
  ) where
 
 import           Ray (Ray (Ray))
 import           Vec (Point3, Vec3, vec, (.*), (./))
-
-aspectRatio :: Double
-aspectRatio = 16.0 / 9.0;
 
 data Camera = Camera {
     origin          :: Point3,
@@ -21,12 +17,15 @@ data Camera = Camera {
     vertical        :: Vec3
 }
 
-camera :: Camera
-camera = Camera { origin, lowerLeftCorner, horizontal, vertical }
+camera :: Double -> Double -> Camera
+camera verticalFov aspectRatio = Camera { origin, lowerLeftCorner, horizontal, vertical }
     where
-        viewportHeight = 2.0
+        theta = verticalFov * pi / 180.0
+        h = tan (theta / 2.0)
+        viewportHeight = 2.0 * h
         viewportWidth = aspectRatio * viewportHeight
         focalLength = 1.0
+
         origin = vec 0 0 0
         horizontal = vec viewportWidth 0 0
         vertical = vec 0 viewportHeight 0
