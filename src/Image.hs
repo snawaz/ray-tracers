@@ -6,7 +6,6 @@ module Image(
     writeImage
 ) where
 
-import           Control.DeepSeq       (force)
 import           Data.List             (foldl')
 import           Data.Maybe            (fromMaybe)
 import           Numeric.Limits        (maxValue)
@@ -16,6 +15,8 @@ import           System.Directory      (createDirectoryIfMissing, renameFile)
 import           System.IO             (IOMode (WriteMode), hPutStrLn, withFile)
 import           System.Random         (RandomGen, mkStdGen)
 import           Text.Printf           (printf)
+import           Control.DeepSeq       (force)
+import           Control.Parallel.Strategies (using, rseq, parListChunk)
 
 import           Camera                (camera, rayAt)
 import           Colors                (Color, ColorVec, SampledColor (SampledColor), toColor)
@@ -67,7 +68,7 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
                 focusDistance = 10.0
                 aperture = 0.1
         coordinates = (,) <$> reverse [0..height-1] <*> [0..width-1]
-        colors = fmap computeColor coordinates
+        colors = fmap computeColor coordinates `using` parListChunk 32 rseq
         computeColor (j, i) = color
             where
                  g = mkStdGen (i * width + j)
