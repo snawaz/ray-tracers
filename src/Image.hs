@@ -11,7 +11,7 @@ import           System.Random  (RandomGen, mkStdGen)
 import           Camera         (camera, rayAt)
 import           Colors         (Color, ColorVec, SampledColor (SampledColor), toColor)
 import           Hittable       (HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian), Material (Material),
-                                 Metal (Metal), Sphere (Sphere), scatter)
+                                 Metal (Metal), Sphere (Sphere), Dielectric(Dielectric), scatter)
 import           Ray            (Ray (Ray))
 import           Samplings      (sampleFraction)
 import           Vec            (one, unit, vec, yCoor, zero, (.*))
@@ -32,7 +32,7 @@ createImage width height = Image width height colors
                 (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.7 0.3 0.3)))),
                 (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
                 (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.5))),
-                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.8 0.8) 0.5)))
+                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Dielectric 1.5)))
             ]
         samplePerPixels = 100
         depth = 50

@@ -20,7 +20,7 @@ import           System.Random (RandomGen)
 import           Colors        (ColorVec)
 import           Ray           (Ray (Ray), pointAt)
 import           Samplings     (samplePointInSphere, sampleUnitVector)
-import           Vec           (Point3, Vec3, dot, lenSquared, unit, (.*), (./))
+import           Vec           (Point3, Vec3, dot, lenSquared, unit, (.*), (./), one, lenSquared)
 
 
 data HitRecord = HitRecord {
@@ -83,7 +83,7 @@ class Scatterable a where
 
 data Lambertian = Lambertian ColorVec
 data Metal = Metal ColorVec Double
-data Dielectric = Dielectric
+data Dielectric = Dielectric Double
 
 instance Scatterable Lambertian where
     scatter (Lambertian color) _ray (HitRecord p normal _ _ _) g = (Just (scattered, color), g1)
@@ -101,3 +101,17 @@ instance Scatterable Metal where
             reflected = reflect (unit direction) normal
             scattered = Ray p (reflected + sampled .* (min fuzz 1.0))
 
+refract ::  Vec3 -> Vec3 -> Double -> Vec3
+refract unitRay normal etai_over_etat = r_out_perp + r_out_perp
+    where
+        cos_theta = dot (-unitRay) normal
+        r_out_parallel = (unitRay + normal .* cos_theta) .* etai_over_etat
+        r_out_perp = negate $ normal .* sqrt (1.0 - lenSquared r_out_parallel)
+
+instance Scatterable Dielectric where
+    scatter (Dielectric refIdx) (Ray _ direction) rec g = (Just (scattered, attenuation), g)
+        where
+            attenuation = one
+            etai_over_etat = if front_face rec then 1.0 / refIdx else refIdx
+            refracted = refract (unit direction) (normal rec) etai_over_etat
+            scattered = Ray (p rec) refracted
