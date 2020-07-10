@@ -10,11 +10,10 @@ import           System.Random  (RandomGen, mkStdGen)
 
 import           Camera         (camera, rayAt)
 import           Colors         (Color, ColorVec, SampledColor (SampledColor), toColor)
-import           Hittable       (Dielectric (Dielectric), HitRecord (HitRecord), Hittable (hit), HittableList (HittableList), Lambertian (Lambertian),
-                                 Material (Material), Metal (Metal), Sphere (Sphere), scatter)
+import           Hittable       (HitRecord (HitRecord), Hittable (hit), Material (Material), scatter)
 import           Ray            (Ray (Ray))
 import           Samplings      (sampleFraction)
-import           Vec            (one, unit, vec, yCoor, zero, (.*), len)
+import           Vec            (len, one, unit, vec, yCoor, zero, (.*))
 
 data Image = Image {
         imageWidth  :: Int,
@@ -25,26 +24,17 @@ data Image = Image {
 aspectRatio :: Double
 aspectRatio = 16.0 / 9.0
 
-createImage :: Int -> Int -> Image
-createImage width height = Image width height colors
+createImage :: Hittable a => Int -> Int -> Int -> a -> Int -> Image
+createImage width height samplePerPixels world depth = Image width height colors
     where
-        world = HittableList [
-                (Sphere (vec 0 0 (-1)) 0.5 (Material (Lambertian (vec 0.1 0.2 0.5)))),
-                (Sphere (vec 0 (-100.5) (-1)) 100 (Material (Lambertian (vec 0.8 0.8 0.0)))),
-                (Sphere (vec 1 0 (-1)) 0.5 (Material (Metal (vec 0.8 0.6 0.2) 0.3))),
-                (Sphere (vec (-1) 0 (-1)) 0.5 (Material (Dielectric 1.5))),
-                (Sphere (vec (-1) 0 (-1)) (-0.45) (Material (Dielectric 1.5)))
-            ]
-        samplePerPixels = 100
-        depth = 50
         cam = camera lookFrom lookAt viewUp 20.0 aspectRatio aperture focusDistance
             where
-                lookFrom = vec 3 3 2
-                lookAt = vec 0 0 (-1)
+                lookFrom = vec 13 2 3
+                lookAt = vec 0 0 0
                 viewUp = vec 0 1 0
-                focusDistance = len $ lookFrom - lookAt
-                aperture = 2.0
-        coordinates = (,) <$> [0..height-1] <*> reverse [0..width-1]
+                focusDistance = 10.0
+                aperture = 0.1
+        coordinates = (,) <$> reverse [0..height-1] <*> [0..width-1]
         colors = fst $ foldl' computeColor ([], mkStdGen 22) coordinates
         computeColor (colors', g) (j, i) = (color:colors', g')
              where
@@ -60,10 +50,9 @@ createImage width height = Image width height colors
                          (colorVec, g4) = rayColor ray world g3 depth
                          c =  SampledColor(samplePerPixels, colorVec)
 
-writeImage :: IO ()
-writeImage = do
-    let width = 100 -- 384
-    let image = createImage width $ floor (fromIntegral width / aspectRatio)
+writeImage :: Hittable a => Int -> Int -> a -> Int -> IO ()
+writeImage imgWidth samplePerPixels world depth = do
+    let image = createImage imgWidth (floor (fromIntegral imgWidth / aspectRatio)) samplePerPixels world depth
     putStrLn "P3"
     putStrLn $ show (imageWidth image) ++ " " ++ show (imageHeight image)
     print 255

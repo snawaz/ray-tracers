@@ -18,9 +18,6 @@ arity = 3
 
 data Vec a = Vec [a] deriving(Show, Functor)
 
-type Vec3 = Vec Double
-type Point3 = Vec Double
-
 instance Num a => Num (Vec a) where
     Vec v1 + Vec v2 = Vec $ zipWith (+) v1 v2
     Vec v1 - Vec v2 = Vec $ zipWith (-) v1 v2
@@ -28,6 +25,9 @@ instance Num a => Num (Vec a) where
     abs (Vec v) = Vec $ fmap abs v
     signum (Vec v) = Vec $ fmap signum v
     fromInteger n = Vec $ replicate arity (fromInteger n)
+
+type Vec3 = Vec Double
+type Point3 = Vec Double
 
 vec :: Num a => a -> a -> a -> Vec a
 vec x y z = Vec [x, y, z]

@@ -24,6 +24,7 @@ executable ray-tracers
                        Hittable
                        Camera
                        Samplings
+                       Scenes
   build-depends:       base >=4.12 && <4.13,
                        numeric-limits >= 0.1.0,
                        random >=1.0 && <1.1
