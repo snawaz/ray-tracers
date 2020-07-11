@@ -1,6 +1,7 @@
 
 
 {-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE BangPatterns    #-}
 
 module Image(
     writeImage
@@ -24,7 +25,7 @@ import           Hittable              (HitRecord (HitRecord), Hittable (hit), M
 import           Ray                   (Ray (Ray))
 import           Samplings             (sampleFraction)
 import           Utils                 (getSecondsNow)
-import           Vec                   (len, one, unit, vec, yCoor, zero, (.*))
+import           Vec                   (one, unit, vec, yCoor, zero, (.*))
 
 data Image = Image {
         imageWidth  :: Int,
@@ -81,20 +82,19 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
                          u = (fromIntegral i + r1) / fromIntegral (width - 1)
                          v = (fromIntegral j + r2) / fromIntegral (height - 1)
                          (ray, g3) = rayAt cam u v g2
-                         (colorVec, g4) = rayColor ray world g3 raysPerSample
+                         (colorVec, g4) = rayColor ray world g3 raysPerSample one
                          c =  SampledColor(samplesPerPixel, colorVec)
 
-rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> (ColorVec, g)
-rayColor ray@(Ray _origin direction) world g raysPerSample =if raysPerSample <= 0 then (force zero, g) else computeColor
+rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> ColorVec -> (ColorVec, g)
+rayColor ray@(Ray _origin direction) world g raysPerSample !acc =if raysPerSample <= 0 then (force zero, g) else computeColor
     where
         h = hit world ray 0.001 maxValue
         t = 0.5 * (yCoor (unit direction) + 1.0)
         default_color = one .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
-        computeColor = fromMaybe (force default_color, g) $ do
+        computeColor = fromMaybe (force $ acc * default_color, g) $ do
                                                 record@(HitRecord _ _ (Material m) _ _ ) <- h
                                                 let (maybeScattered, g1) = scatter m ray record g
                                                 return $ fromMaybe (force zero, g1) $ do
                                                                 (scatteredRay, attenuation) <- maybeScattered
-                                                                let (c, g2) = rayColor scatteredRay world g1 (raysPerSample - 1)
-                                                                return (force $ attenuation * c, g2)
+                                                                return $ rayColor scatteredRay world g1 (raysPerSample - 1) (force $ acc * attenuation)
 
