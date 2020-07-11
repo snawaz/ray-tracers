@@ -13,29 +13,28 @@ module Vec(
 
 import           Control.DeepSeq (NFData, rnf)
 
-import           Utils           (rotate)
-
-arity :: Int
-arity = 3
-
-data Vec a = Vec [a] deriving(Show, Functor)
+data Vec a = Vec {
+    xCoor :: a,
+    yCoor :: a,
+    zCoor :: a
+} deriving(Show, Functor)
 
 instance Num a => Num (Vec a) where
-    Vec v1 + Vec v2 = Vec $ zipWith (+) v1 v2
-    Vec v1 - Vec v2 = Vec $ zipWith (-) v1 v2
-    Vec v1 * Vec v2 = Vec $ zipWith (*) v1 v2
-    abs (Vec v) = Vec $ fmap abs v
-    signum (Vec v) = Vec $ fmap signum v
-    fromInteger n = Vec $ replicate arity (fromInteger n)
+    Vec x1 y1 z1 + Vec x2 y2 z2 = Vec (x1 + x2) (y1 + y2) (z1 + z2)
+    Vec x1 y1 z1 - Vec x2 y2 z2 = Vec (x1 - x2) (y1 - y2) (z1 - z2)
+    Vec x1 y1 z1 * Vec x2 y2 z2 = Vec (x1 * x2) (y1 * y2) (z1 * z2)
+    abs v = fmap abs v
+    signum v = fmap signum v
+    fromInteger n = from (fromInteger n)
 
 instance NFData a => NFData (Vec a) where
-    rnf (Vec xs) = rnf xs
+    rnf (Vec x y z) = rnf x `seq` rnf y `seq` rnf z
 
 type Vec3 = Vec Double
 type Point3 = Vec Double
 
 vec :: Num a => a -> a -> a -> Vec a
-vec x y z = Vec [x, y, z]
+vec x y z = Vec x y z
 
 from :: Num a => a -> Vec a
 from n = vec n n n
@@ -46,26 +45,15 @@ zero = from 0
 one :: Num a => Vec a
 one = from 1
 
-xCoor :: Num a => Vec a -> a
-xCoor (Vec [x', _, _]) = x'
-xCoor _                = undefined
-
-yCoor :: Num a => Vec a -> a
-yCoor (Vec [_, y', _]) = y'
-yCoor _                = undefined
-
-zCoor :: Num a => Vec a -> a
-zCoor (Vec [_, _, z']) = z'
-zCoor _                = undefined
-
 dot :: Num a => Vec a -> Vec a -> a
-dot (Vec v1) (Vec v2) = sum $ zipWith (*) v1 v2
+dot (Vec x1 y1 z1) (Vec x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 cross :: Num a => Vec a -> Vec a -> Vec a
-cross (Vec v1) (Vec v2) = Vec $ zipWith (-) a b
-    where
-        a = zipWith (*) (rotate 1 v1) (rotate 2 v2)
-        b = zipWith (*) (rotate 2 v1) (rotate 1 v2)
+cross (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec x y z
+     where
+        x = y1 * z2 - z1 * y2
+        y = z1 * x2 - x1 * z2
+        z = x1 * y2 - y1 * x2
 
 infixl 6 .+
 (.+) :: (Num a) => Vec a -> a -> Vec a
