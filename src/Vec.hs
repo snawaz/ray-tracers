@@ -14,9 +14,9 @@ module Vec(
 import           Control.DeepSeq (NFData, rnf)
 
 data Vec a = Vec {
-    xCoor :: a,
-    yCoor :: a,
-    zCoor :: a
+    xCoor :: !a,
+    yCoor :: !a,
+    zCoor :: !a
 } deriving(Show, Functor)
 
 instance Num a => Num (Vec a) where
