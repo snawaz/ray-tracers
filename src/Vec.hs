@@ -11,7 +11,7 @@
 module Vec(
     Vec (Vec),
     zero, one, from ,vec,
-    xCoor, yCoor, zCoor,
+    getX, getY, getZ,
     dot, cross, unit,
     (.+), (.-), (.*), (./),
     Point3, Vec3,
@@ -21,13 +21,12 @@ module Vec(
 import           Control.DeepSeq (NFData, rnf)
 
 data Vec a = Vec {
-    xCoor :: !a,
-    yCoor :: !a,
-    zCoor :: !a
+    getX :: !a,
+    getY :: !a,
+    getZ :: !a
 } deriving(Show, Functor)
 
--- instance Num a => Num (Vec a) where
-instance Num (Vec Double) where
+instance Num a => Num (Vec a) where
     {-# INLINE (+) #-}
     Vec x1 y1 z1 + Vec x2 y2 z2 = Vec (x1 + x2) (y1 + y2) (z1 + z2)
     {-# INLINE (-) #-}
@@ -57,7 +56,7 @@ one :: Num a => Vec a
 one = from 1
 
 {-# INLINE dot #-}
--- dot :: Num a => Vec a -> Vec a -> a
+dot :: Num a => Vec a -> Vec a -> a
 dot (Vec x1 y1 z1) (Vec x2 y2 z2) = x1 * x2 + y1 * y2 + z1 * z2
 
 {-# INLINE cross #-}

@@ -10,10 +10,9 @@ module Main(main) where
 
 import           System.Environment (getArgs)
 
-import Hittable
 import           Image              (writeImage)
 import           Scenes             (randomScene)
-import           Utils              (getSecondsNow, printCurrentTime)
+import           Utils              (printCurrentTime)
 
 main :: IO ()
 main = do
@@ -21,6 +20,5 @@ main = do
     args <- getArgs
     let [width, samplesPerPixel, raysPerSample] = fmap read args
     let scene = randomScene 23
-    printHistableList scene
     writeImage width samplesPerPixel raysPerSample scene
     printCurrentTime $ \now -> "Program stopping at " ++ now

@@ -12,7 +12,7 @@ import           System.Random (RandomGen)
 
 import           Ray           (Ray (Ray))
 import           Samplings     (sampleVecInUnitDisk)
-import           Vec           (Point3, Vec3, cross, unit, xCoor, yCoor, (.*), (./))
+import           Vec           (Point3, Vec3, cross, unit, getX, getY, (.*), (./))
 
 
 data Camera = Camera {
@@ -47,6 +47,6 @@ rayAt Camera{origin, lowerLeftCorner, horizontal, vertical, u, v, w, lensRadius}
     where
         (rd', g1) = sampleVecInUnitDisk g
         rd = rd' .* lensRadius
-        offset = u .* (xCoor rd) + v .* (yCoor rd)
+        offset = u .* (getX rd) + v .* (getY rd)
         orig = origin + offset
         r = Ray orig (lowerLeftCorner + horizontal .* s + vertical .* t - orig)
