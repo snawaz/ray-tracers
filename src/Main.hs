@@ -1,6 +1,10 @@
 
-
-{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms   #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
 
 module Main(main) where
 
@@ -14,7 +18,8 @@ main :: IO ()
 main = do
     printCurrentTime $ \now ->  "Program started at " ++ now
     args <- getArgs
-    let [width, samplesPerPixel, raysPerSample] = fmap read args
     seed <- getSecondsNow
-    _filename <- writeImage width samplesPerPixel raysPerSample (randomScene (floor seed))
+    let [width, samplesPerPixel, raysPerSample] = fmap read args
+    let scene = randomScene (floor seed)
+    writeImage width samplesPerPixel raysPerSample scene
     printCurrentTime $ \now -> "Program stopping at " ++ now

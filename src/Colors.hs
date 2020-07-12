@@ -1,6 +1,9 @@
-
-{-# LANGUAGE FlexibleInstances    #-}
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE FunctionalDependencies     #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 
 module Colors(
     Color,
@@ -10,24 +13,29 @@ module Colors(
 ) where
 
 import           Control.DeepSeq (NFData, rnf)
-import           Text.Printf     (printf)
+import           Control.DeepSeq (force)
 
 import           Vec             (Vec (Vec), (./))
 
-newtype Color = Color (Int, Int, Int)
+newtype AnyColor a = AnyColor (Vec a) deriving(Functor, Num)
 
-type ColorVec = Vec Double
+type ColorVec = AnyColor Double
+
+type Color = AnyColor Int
 
 newtype SampledColor = SampledColor (Int, ColorVec)
 
-instance Show Color where
-    show (Color(r,g,b)) = printf "%3d %3d %3d" r g b
+instance Show a => Show (AnyColor a) where
+    show (AnyColor (Vec r g b)) = show r ++ " " ++ show g ++ " " ++ show b
 
-class ToColor a where
-    toColor :: a -> Color
+class ToColor a b | b -> a where
+    toColor :: a -> AnyColor b
 
-instance NFData Color where
-    rnf (Color(r, g, b)) = rnf r `seq` rnf g `seq` rnf b
+instance ToColor (Vec Double) Double where
+    toColor v = AnyColor v
+
+instance NFData a => NFData (AnyColor a) where
+    rnf (AnyColor v) = rnf v
 
 instance Num SampledColor where
     (SampledColor(_, v1)) + (SampledColor (n, v2)) = SampledColor(n, v1 + v2)
@@ -43,8 +51,5 @@ instance NFData SampledColor where
 clamp :: Ord a => a -> a -> a -> a
 clamp lo hi val = min hi (max lo val)
 
-instance ToColor SampledColor where
-    toColor (SampledColor(n, v)) = Color(x, y, z)
-         where
-             (Vec x y z) = fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
-
+instance ToColor SampledColor Int where
+    toColor (SampledColor(n, AnyColor v)) = AnyColor $ force $ fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n

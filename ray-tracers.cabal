@@ -26,16 +26,17 @@ executable ray-tracers
                        Samplings
                        Scenes
   build-depends:       base >=4.12 && <4.13,
-                       numeric-limits >= 0.1.0,
-                       random >=1.0 && <1.1,
-                       time >= 1.1,
-                       directory >= 1.3,
-                       pretty-terminal >= 0.1.0,
+                       random >=1.2,
                        deepseq >= 1.4.4.0,
-                       parallel >= 3.2.2.0
+                       parallel >= 3.2.2.0,
+                       numeric-limits >= 0.1.0,
+                       directory >= 1.3,
+                       array >= 0.5,
+                       time >= 1.1,
+                       pretty-terminal >= 0.1.0
   hs-source-dirs:      src
-  ghc-options:         -O2
-                       -rtsopts -threaded -eventlog
+  ghc-options:         -O2 
+                       -rtsopts -threaded 
                        -Wall 
                        -Werror=missing-import-lists -Werror=missing-export-lists
                        -Wno-type-defaults 
