@@ -1,31 +1,30 @@
-
-
-{-# LANGUAGE PatternSynonyms #-}
-{-# LANGUAGE BangPatterns    #-}
+{-# LANGUAGE BangPatterns     #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PatternSynonyms  #-}
 
 module Image(
     writeImage
 ) where
 
-import           Data.Maybe            (fromMaybe)
-import           Numeric.Limits        (maxValue)
-import           System.Console.Pretty (pattern Green)
-import qualified System.Console.Pretty as Pretty
-import           System.Directory      (createDirectoryIfMissing, renameFile)
-import           System.IO             (IOMode (WriteMode), hPutStrLn, withFile)
-import Control.Exception (evaluate)
-import           System.Random         (RandomGen, mkStdGen)
-import           Text.Printf           (printf)
-import           Control.DeepSeq       (force)
-import           Control.Parallel.Strategies (using, rseq, parListChunk)
+import           Control.DeepSeq             (force)
+import           Control.Exception           (evaluate)
+import           Control.Parallel.Strategies (parListChunk, rseq, using)
+import           Data.Maybe                  (fromMaybe)
+import           Numeric.Limits              (maxValue)
+import           System.Console.Pretty       (pattern Green)
+import qualified System.Console.Pretty       as Pretty
+import           System.Directory            (createDirectoryIfMissing, renameFile)
+import           System.IO                   (IOMode (WriteMode), hPutStrLn, withFile)
+import           System.Random               (RandomGen, mkStdGen)
+import           Text.Printf                 (printf)
 
-import           Camera                (camera, rayAt)
-import           Colors                (Color, ColorVec, SampledColor (SampledColor), toColor)
-import           Hittable              (HitRecord (HitRecord), Hittable (hit), Material (Material), scatter)
-import           Ray                   (Ray (Ray))
-import           Samplings             (sampleFraction)
-import           Utils                 (getSecondsNow)
-import           Vec                   (one, unit, vec, getY, zero, (.*))
+import           Camera                      (camera, rayAt)
+import           Colors                      (Color, ColorVec, SampledColor (SampledColor), toColor)
+import           Hittable                    (HitRecord (HitRecord), Hittable (hit), Material (Material), scatter)
+import           Ray                         (Ray (Ray))
+import           Samplings                   (sampleFraction)
+import           Utils                       (getSecondsNow)
+import           Vec                         (getY, one, unit, vec, zero, (.*))
 
 data Image = Image {
         imageWidth  :: Int,
@@ -42,7 +41,7 @@ writeImage width samplesPerPixel raysPerSample world = do
     let height = floor $ fromIntegral width / aspectRatio
     let image = createImage width height samplesPerPixel raysPerSample world
     start <- getSecondsNow
-    let mkFilename secs rate = 
+    let mkFilename secs rate =
             printf "images/%d.%dx%d.%d-%d.%dm-%ds.%d.ppm" rate width height samplesPerPixel raysPerSample (secs `div` 60) (secs `rem` 60) ((floor start) :: Int)
     colors <- evaluate $ force $ imageColors image
     withFile "images/tmp.ppm" WriteMode $ \h -> do
@@ -58,7 +57,7 @@ writeImage width samplesPerPixel raysPerSample world = do
     putStrLn $ "time elapsed      : " ++ Pretty.color Green (printf "%.3f" elapsed ++ " seconds")
     putStrLn $ "pixels per second : " ++ Pretty.color Green (printf "%.3f" pixelRate)
     putStrLn $ "Image produced    : " ++ Pretty.color Green filename
-    
+
 createImage :: Hittable a => Int -> Int -> Int -> Int -> a -> Image
 createImage width height samplesPerPixel raysPerSample world = Image width height colors
     where
@@ -73,7 +72,7 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
         computeColor (j, i) = color
             where
                 g = mkStdGen (i * width + j)
-                (sampledColor, _) = loop sampledRayColor (SampledColor(samplesPerPixel, zero), g) samplesPerPixel
+                (sampledColor, _) = loop sampledRayColor (SampledColor(samplesPerPixel, toColor $ zero), g) samplesPerPixel
                 color = force $ toColor sampledColor
                 sampledRayColor (acc, g'') = (force $ c + acc, g4)
                     where
@@ -82,7 +81,7 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
                         u = (fromIntegral i + r1) / fromIntegral (width - 1)
                         v = (fromIntegral j + r2) / fromIntegral (height - 1)
                         (ray, g3) = rayAt cam u v g2
-                        (colorVec, g4) = rayColor ray world g3 raysPerSample one
+                        (colorVec, g4) = rayColor ray world g3 raysPerSample (toColor one)
                         c =  SampledColor(samplesPerPixel, colorVec)
 
 -- https://gitlab.haskell.org/ghc/ghc/-/issues/8763
@@ -94,14 +93,14 @@ loop f v n = go 0 v
                 | otherwise = go (i+1) (f arg)
 
 rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> ColorVec -> (ColorVec, g)
-rayColor ray@(Ray _origin direction) world g raysPerSample !acc =if raysPerSample <= 0 then (force zero, g) else computeColor
+rayColor ray@(Ray _origin direction) world g raysPerSample !acc =if raysPerSample <= 0 then (force (toColor zero), g) else computeColor
     where
         h = hit world ray 0.001 maxValue
         t = 0.5 * (getY (unit direction) + 1.0)
-        default_color = one .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
+        default_color = toColor $ one .* (1.0 -t) + (vec 0.5 0.7 1.0) .* t
         computeColor = fromMaybe (force $ acc * default_color, g) $ do
                                                 record@(HitRecord _ _ (Material m) _ _ ) <- h
                                                 let (maybeScattered, g1) = scatter m ray record g
-                                                return $! fromMaybe (force zero, g1) $ do
+                                                return $! fromMaybe (force $ toColor zero, g1) $ do
                                                                 (scatteredRay, attenuation) <- maybeScattered
                                                                 return $ rayColor scatteredRay world g1 (raysPerSample - 1) (acc * attenuation)

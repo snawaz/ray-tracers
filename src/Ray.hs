@@ -1,4 +1,3 @@
-
 module Ray(
     Ray(Ray),
     getOrigin, getDirection, pointAt

@@ -35,12 +35,14 @@ executable ray-tracers
                        time >= 1.1,
                        pretty-terminal >= 0.1.0
   hs-source-dirs:      src
-  ghc-options:         -O2
-                        -rtsopts -threaded -eventlog
-                        -fllvm -optc-mfpmath=sse  -fexcess-precision -optlo-O3 -funfolding-use-threshold1000 -optl-ffast-math
-                        -Wall 
-                        -Werror=missing-import-lists -Werror=missing-export-lists
-                        -Wno-type-defaults 
+  ghc-options:         -O2 
+                       -rtsopts -threaded 
+                       -- -eventlog
+                       -fspecialise-aggressively -fspec-constr-count=16
+                       -fllvm -optc-mfpmath=sse  -fexcess-precision -optlo-O3 -funfolding-use-threshold1000 -optl-ffast-math
+                       -Wall 
+                       -Werror=missing-import-lists -Werror=missing-export-lists
+                       -Wno-type-defaults 
   -- ghc-options:         -threaded -rtsopts -eventlog -O2 
                        -- -fspec-constr-count=16 -fllvm -optc-mfpmath=sse  -fexcess-precision -optlo-O3 -funfolding-use-threshold1000 -optl-ffast-math
   default-language:    Haskell2010

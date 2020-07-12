@@ -12,7 +12,7 @@ import           System.Random (RandomGen)
 
 import           Ray           (Ray (Ray))
 import           Samplings     (sampleVecInUnitDisk)
-import           Vec           (Point3, Vec3, cross, unit, getX, getY, (.*), (./))
+import           Vec           (Point3, Vec3, cross, getX, getY, unit, (.*), (./))
 
 
 data Camera = Camera {

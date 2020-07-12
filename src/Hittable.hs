@@ -1,13 +1,12 @@
-
+{-# LANGUAGE BangPatterns              #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts          #-}
 {-# OPTIONS -Wno-unused-top-binds #-}
 
 module Hittable(
     HitRecord (HitRecord),
     Hittable(hit),
-    HittableList (HittableList), 
+    HittableList (HittableList),
     toHittableList,
     Sphere (Sphere),
     Material (Material),
@@ -15,22 +14,22 @@ module Hittable(
     Scatterable, scatter
 ) where
 
-import           Data.Maybe    (fromMaybe)
-import           System.Random (RandomGen)
-import           Data.Array (Array, bounds, listArray)
+import           Data.Array      (Array, bounds, listArray)
 import           Data.Array.Base (unsafeAt)
+import           Data.Maybe      (fromMaybe)
+import           System.Random   (RandomGen)
 
-import           Colors        (ColorVec)
-import           Ray           (Ray (Ray), pointAt)
-import           Samplings     (sampleFraction, samplePointInSphere, sampleUnitVector)
-import           Vec           (Point3, Vec3, dot, lenSquared, one, unit, (.*), (./))
+import           Colors          (ColorVec, toColor)
+import           Ray             (Ray (Ray), pointAt)
+import           Samplings       (sampleFraction, samplePointInSphere, sampleUnitVector)
+import           Vec             (Point3, Vec3, dot, lenSquared, one, unit, (.*), (./))
 
 
 data HitRecord = HitRecord {
-    getP          :: !Point3,
-    getNormal     :: !Vec3,
-    getmat        :: !Material,
-    getT          :: !Double,
+    getP        :: !Point3,
+    getNormal   :: !Vec3,
+    getmat      :: !Material,
+    getT        :: !Double,
     isFrontFace :: !Bool
 }
 
@@ -63,21 +62,21 @@ instance Hittable Sphere where
                          normal = if front_face then outward_normal else -outward_normal
                  t1 = (-half_b - root)/a
                  t2 = (-half_b + root)/a
-                 r = if t1 < tmax && t1 > tmin 
+                 r = if t1 < tmax && t1 > tmin
                         then Just (mkRecord t1)
                         else if t2 < tmax && t2 > tmin
                              then Just (mkRecord t2)
-                             else Nothing   
+                             else Nothing
          record =  if discriminant > 0 then recordFn $ sqrt discriminant else Nothing
 
 newtype HittableList a = HittableList (Array Int a)
 
 toHittableList :: Hittable a => [a] -> HittableList a
-toHittableList objects = HittableList $ listArray (1, length objects) objects 
+toHittableList objects = HittableList $ listArray (1, length objects) objects
 
 -- https://gitlab.haskell.org/ghc/ghc/-/issues/8763
 {-# INLINE loop_hit #-}
-loop_hit :: (a -> Int -> a) -> a -> Int -> a  
+loop_hit :: (a -> Int -> a) -> a -> Int -> a
 loop_hit f v n = go 0 v
   where
       go !i arg | i == n = arg
@@ -138,7 +137,7 @@ schlick cosine refIdx = r0 + (1 - r0) * (1-cosine) ^ 5
 instance Scatterable Dielectric where
     scatter (Dielectric refIdx) (Ray _ direction) rec g = (Just (scattered, attenuation), g1)
         where
-            attenuation = one
+            attenuation = toColor (one :: Vec3)
             etai_over_etat = if isFrontFace rec then 1.0 / refIdx else refIdx
             cos_theta = min (dot (negate $ unit direction) (getNormal rec)) 1.0
             sin_theta = sqrt (1.0 - cos_theta * cos_theta)

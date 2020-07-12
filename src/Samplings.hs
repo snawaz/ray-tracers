@@ -1,8 +1,7 @@
-
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE TypeFamilies        #-}
 
 module Samplings(
     sampleFraction,
@@ -22,7 +21,7 @@ import           Data.List     (foldl')
 import           Data.Maybe    (fromJust, isJust)
 import           System.Random (RandomGen, randomR)
 
-import           Vec           (Point3, Vec3, dot, lenSquared, Vec(Vec))
+import           Vec           (Point3, Vec (Vec), Vec3, dot, lenSquared)
 
 sampleFraction :: RandomGen g => g -> (Double, g)
 sampleFraction g = randomR (0, 1) g

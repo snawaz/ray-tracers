@@ -1,4 +1,3 @@
-
 module Utils(
     rotate,
     getSecondsNow,
@@ -11,7 +10,6 @@ import           Data.Time.Clock        (getCurrentTime)
 import           Data.Time.Clock.System (getSystemTime, systemNanoseconds, systemSeconds)
 import           Data.Time.Format       (defaultTimeLocale, formatTime)
 import           Data.Time.LocalTime    (getCurrentTimeZone, utcToZonedTime)
--- import           Data.Int
 
 rotate :: Int -> [a] -> [a]
 rotate _ [] = []
