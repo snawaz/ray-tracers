@@ -1,6 +1,9 @@
 
 build:
-	cabal v2-build
+	# cabal clean
+	# cabal v2-build -O2 --enable-profiling  --enable-executable-profiling
+	# cabal v2-build -O2 --verbose=3
+	cabal v2-build -O2 
 
 render:
 	rm -f image.ppm

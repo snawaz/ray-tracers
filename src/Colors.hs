@@ -11,23 +11,27 @@ module Colors(
 
 import           Control.DeepSeq (NFData, rnf)
 import           Text.Printf     (printf)
+import           Control.DeepSeq       (force)
 
 import           Vec             (Vec (Vec), (./))
 
-newtype Color = Color (Int, Int, Int)
+-- newtype Color = Color (Int, Int, Int)
+type Color = Vec Int 
 
 type ColorVec = Vec Double
 
 newtype SampledColor = SampledColor (Int, ColorVec)
 
-instance Show Color where
-    show (Color(r,g,b)) = printf "%3d %3d %3d" r g b
+--instance Show Color where
+    -- show (Color(r,g,b)) = printf "%3d %3d %3d" r g b
+--    show (Vec r g b) = printf "%3d %3d %3d" r g b
+    
 
 class ToColor a where
     toColor :: a -> Color
 
-instance NFData Color where
-    rnf (Color(r, g, b)) = rnf r `seq` rnf g `seq` rnf b
+--instance NFData Color where
+--    rnf (Color(r, g, b)) = rnf r `seq` rnf g `seq` rnf b
 
 instance Num SampledColor where
     (SampledColor(_, v1)) + (SampledColor (n, v2)) = SampledColor(n, v1 + v2)
@@ -44,7 +48,7 @@ clamp :: Ord a => a -> a -> a -> a
 clamp lo hi val = min hi (max lo val)
 
 instance ToColor SampledColor where
-    toColor (SampledColor(n, v)) = Color(x, y, z)
-         where
-             (Vec x y z) = fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
+    toColor (SampledColor(n, v)) = force $ fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
+         -- where
+             -- (Vec x y z) = force $ fmap (floor . (256.0*) . clamp 0.0 0.999 . sqrt) $ v ./ fromIntegral n
 

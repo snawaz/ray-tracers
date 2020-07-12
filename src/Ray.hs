@@ -7,8 +7,8 @@ module Ray(
 import           Vec (Point3, Vec3, (.*))
 
 data Ray = Ray {
-    origin    :: Point3,
-    direction :: Vec3
+    origin    :: !Point3,
+    direction :: !Vec3
 }
 
 pointAt :: Ray -> Double -> Point3
