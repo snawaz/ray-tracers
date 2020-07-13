@@ -37,6 +37,8 @@ executable ray-tracers
   hs-source-dirs:      src
   ghc-options:         -O2 
                        -rtsopts -threaded 
+                       -fllvm -optlo-O3 -optl-ffast-math
+                       -fexcess-precision -funfolding-use-threshold1000
                        -Wall 
                        -Werror=missing-import-lists -Werror=missing-export-lists
                        -Wno-type-defaults 
