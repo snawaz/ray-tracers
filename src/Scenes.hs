@@ -7,7 +7,7 @@ import           System.Random (mkStdGen)
 import           Colors        (toColor)
 import           Hittable      (Dielectric (Dielectric), HittableList, Lambertian (Lambertian), Material (Material), Metal (Metal), Sphere (Sphere),
                                 toHittableList)
-import           Samplings     (sampleFraction, sampleFractions, samplePoints)
+import           Samplings     (sampleFraction, sampleFraction3, samplePoint2)
 import           Vec           (from, len, vec)
 
 randomScene :: Int -> HittableList Sphere
@@ -18,12 +18,12 @@ randomScene seed = toHittableList allObjects
         randomObjects = fst $ foldl' mkObject ([], mkStdGen seed) $ (,) <$> [-11..11] <*> [-11..11]
         mkObject (objects, g) (a, b) = (fromMaybe objects (fmap (\o-> o:objects) object), g2)
             where
-                ([chooseMat, x, z], g1) = sampleFractions g 3
+                ((chooseMat, x, z), g1) = sampleFraction3 g
                 center = vec (a + 0.9 * x) 0.2 (b + 0.9 * z)
                 (object, g2) = if len (center - vec 4 0.2 0) > 0.9 then createRandomObject g1 else (Nothing, g1)
                 createRandomObject g3 = (Just obj, g5)
                     where
-                        ([p1, p2], g4) = samplePoints g3 2
+                        ((p1, p2), g4) = samplePoint2 g3
                         (d1, g5) = sampleFraction g4
                         mat = if chooseMat < 0.8
                                  then Material $ Lambertian (toColor $ p1 * p2)
