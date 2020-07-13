@@ -12,13 +12,14 @@ import           System.Environment (getArgs)
 
 import           Image              (writeImage)
 import           Scenes             (randomScene)
-import           Utils              (printCurrentTime)
+import           Utils              (printCurrentTime, getSecondsNow)
 
 main :: IO ()
 main = do
     printCurrentTime $ \now ->  "Program started at " ++ now
     args <- getArgs
+    seed <- getSecondsNow
     let [width, samplesPerPixel, raysPerSample] = fmap read args
-    let scene = randomScene 23
+    let scene = randomScene (floor seed)
     writeImage width samplesPerPixel raysPerSample scene
     printCurrentTime $ \now -> "Program stopping at " ++ now
