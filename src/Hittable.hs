@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns              #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts          #-}
 {-# OPTIONS -Wno-unused-top-binds #-}
@@ -22,6 +21,7 @@ import           System.Random   (RandomGen)
 import           Colors          (ColorVec, toColor)
 import           Ray             (Ray (Ray), pointAt)
 import           Samplings       (sampleFraction, samplePointInSphere, sampleUnitVector)
+import           Utils           (loop)
 import           Vec             (Point3, Vec3, dot, lenSquared, one, unit, (.*), (./))
 
 
@@ -74,19 +74,11 @@ newtype HittableList a = HittableList (Array Int a)
 toHittableList :: Hittable a => [a] -> HittableList a
 toHittableList objects = HittableList $ listArray (1, length objects) objects
 
--- https://gitlab.haskell.org/ghc/ghc/-/issues/8763
-{-# INLINE loop_hit #-}
-loop_hit :: (a -> Int -> a) -> a -> Int -> a
-loop_hit f v n = go 0 v
-  where
-      go !i arg | i == n = arg
-                | otherwise = go (i+1) (f arg i)
-
 instance Hittable a => Hittable (HittableList a) where
     hit (HittableList items) ray tmin tmax = record
         where
             (s, e) = bounds items
-            record = fst $ loop_hit reduce (Nothing, tmax) (e-s+1)
+            record = fst $ loop reduce (Nothing, tmax) (e-s+1)
             reduce (current_rec, current_max) i = fromMaybe (current_rec, current_max) m
                 where
                     m = do

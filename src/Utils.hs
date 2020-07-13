@@ -1,5 +1,8 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Utils(
     rotate,
+    loop,
     getSecondsNow,
     getSecondsElapsed,
     getCurrentTimeString,
@@ -14,6 +17,13 @@ import           Data.Time.LocalTime    (getCurrentTimeZone, utcToZonedTime)
 rotate :: Int -> [a] -> [a]
 rotate _ [] = []
 rotate n xs = zipWith const (drop n (cycle xs)) xs
+
+{-# INLINE loop #-}
+loop :: (a -> Int -> a) -> a -> Int -> a
+loop f v n = go 0 v
+  where
+      go !i arg | i == n = arg
+                | otherwise = go (i+1) (f arg i)
 
 getSecondsNow :: IO Double
 getSecondsNow = do

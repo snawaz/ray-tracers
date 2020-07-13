@@ -67,23 +67,23 @@ sampleBetween3 g minVal maxVal =  ((x, y, z), g3)
         (z, g3) = sampleBetween g2 minVal maxVal
 
 -------- Functions returning Point3 and Point3s ----------------
- 
+
 {-# INLINE samplePointBetween #-}
 samplePointBetween :: RandomGen g => g -> Double -> Double -> (Point3, g)
-samplePointBetween g a b = (Vec x y z, g1) 
+samplePointBetween g a b = (Vec x y z, g1)
     where
         ((x, y, z), g1) = sampleBetween3 g a b
 
 {-# INLINE samplePoint #-}
 samplePoint :: RandomGen g => g -> (Point3, g)
-samplePoint g = samplePointBetween g 0 1 
+samplePoint g = samplePointBetween g 0 1
 
 {-# INLINE samplePoint2 #-}
 samplePoint2 :: RandomGen g => g -> ((Point3, Point3), g)
 samplePoint2 g = ((p1, p2), g2)
     where
-        (p1, g1) = samplePoint g 
-        (p2, g2) = samplePoint g1 
+        (p1, g1) = samplePoint g
+        (p2, g2) = samplePoint g1
 
 {-# INLINE samplePointInSphere #-}
 samplePointInSphere :: RandomGen g => g -> Double -> (Point3, g)

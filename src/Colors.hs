@@ -35,7 +35,7 @@ instance ToColor (Vec Double) Double where
     toColor v = AnyColor v
 
 instance NFData a => NFData (AnyColor a) where
-    rnf (AnyColor v) = rnf v 
+    rnf (AnyColor v) = rnf v
 
 instance Num SampledColor where
     (SampledColor(_, v1)) + (SampledColor (n, v2)) = SampledColor(n, v1 + v2)

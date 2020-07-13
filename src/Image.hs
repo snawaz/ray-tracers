@@ -23,7 +23,7 @@ import           Colors                      (Color, ColorVec, SampledColor (Sam
 import           Hittable                    (HitRecord (HitRecord), Hittable (hit), Material (Material), scatter)
 import           Ray                         (Ray (Ray))
 import           Samplings                   (sampleFraction)
-import           Utils                       (getSecondsNow)
+import           Utils                       (getSecondsNow, loop)
 import           Vec                         (getY, one, unit, vec, zero, (.*))
 
 data Image = Image {
@@ -74,7 +74,7 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
                 g = mkStdGen (i * width + j)
                 (sampledColor, _) = loop sampledRayColor (SampledColor(samplesPerPixel, toColor $ zero), g) samplesPerPixel
                 color = force $ toColor sampledColor
-                sampledRayColor (acc, g'') = (force $ c + acc, g4)
+                sampledRayColor (acc, g'') _ = (force $ c + acc, g4)
                     where
                         (r1, g1) = sampleFraction g''
                         (r2, g2) = sampleFraction g1
@@ -83,14 +83,6 @@ createImage width height samplesPerPixel raysPerSample world = Image width heigh
                         (ray, g3) = rayAt cam u v g2
                         (colorVec, g4) = rayColor ray world g3 raysPerSample (toColor one)
                         c =  SampledColor(samplesPerPixel, colorVec)
-
--- https://gitlab.haskell.org/ghc/ghc/-/issues/8763
-{-# INLINE loop #-}
-loop :: (a -> a) -> a -> Int -> a
-loop f v n = go 0 v
-  where
-      go !i arg | i == n = arg
-                | otherwise = go (i+1) (f arg)
 
 rayColor :: (Hittable a, RandomGen g) => Ray -> a -> g -> Int -> ColorVec -> (ColorVec, g)
 rayColor ray@(Ray _origin direction) world g raysPerSample !acc =if raysPerSample <= 0 then (force (toColor zero), g) else computeColor

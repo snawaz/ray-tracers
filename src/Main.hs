@@ -12,7 +12,7 @@ import           System.Environment (getArgs)
 
 import           Image              (writeImage)
 import           Scenes             (randomScene)
-import           Utils              (printCurrentTime, getSecondsNow)
+import           Utils              (getSecondsNow, printCurrentTime)
 
 main :: IO ()
 main = do
