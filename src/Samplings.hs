@@ -19,7 +19,6 @@ module Samplings(
     sampleVecInUnitDisk,
 ) where
 
-import           Data.Maybe    (fromJust, isJust)
 import           System.Random (RandomGen, randomR)
 
 import           Vec           (Point3, Vec (Vec), Vec3, dot, lenSquared)
@@ -87,19 +86,9 @@ samplePoint2 g = ((p1, p2), g2)
 
 {-# INLINE samplePointInSphere #-}
 samplePointInSphere :: RandomGen g => g -> Double -> (Point3, g)
-samplePointInSphere g radius = fromJust (find g)
+samplePointInSphere g radius = if (lenSquared p) < radius then (p, g1) else samplePointInSphere g1 radius
     where
-        find g1 = p
-            where
-                (maybeP, g2) = maybePoint g1
-                p = if isJust maybeP
-                       then Just (fromJust maybeP, g2)
-                        else find g2
-
-        maybePoint g1 = (maybeP, g2)
-            where
-                (p, g2) = samplePointBetween g1 (-radius) radius
-                maybeP = if (lenSquared p) < radius then Just p else Nothing
+        (p, g1) = samplePointBetween g (-radius) radius
 
 {-# INLINE sampleUnitVector #-}
 sampleUnitVector :: RandomGen g => g -> (Vec3, g)
@@ -109,7 +98,6 @@ sampleUnitVector g = (Vec (r * cos a) (r * sin a) z, g2)
         (z, g2) = sampleBetween g1 (-1) 1
         r = sqrt (1 - z * z)
 
-
 {-# INLINE samplePointInHemisphere #-}
 samplePointInHemisphere :: RandomGen g => g -> Double -> Vec3 -> (Point3, g)
 samplePointInHemisphere g radius normal = if dot p normal > 0.0 then (p, g1) else (-p, g1)
@@ -118,18 +106,7 @@ samplePointInHemisphere g radius normal = if dot p normal > 0.0 then (p, g1) els
 
 {-# INLINE sampleVecInUnitDisk #-}
 sampleVecInUnitDisk :: RandomGen g => g -> (Vec3, g)
-sampleVecInUnitDisk g = fromJust (find g)
+sampleVecInUnitDisk g = if (lenSquared v) < 1.0 then (v, g1) else sampleVecInUnitDisk g1
     where
-        find g1 = p
-            where
-                (maybeV, g2) = maybeVec g1
-                p = if isJust maybeV
-                       then Just (fromJust maybeV, g2)
-                        else find g2
-
-        maybeVec g1 = (maybeV, g3)
-            where
-                (x, g2) = sampleBetween g1 (-1) 1
-                (y, g3) = sampleBetween g2 (-1) 1
-                v = Vec x y 0
-                maybeV = if (lenSquared v) < 1.0 then Just v else Nothing
+        ((x, y), g1) = sampleBetween2 g (-1) 1
+        v = Vec x y 0
