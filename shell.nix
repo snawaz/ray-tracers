@@ -8,12 +8,13 @@ let
         fllvm = super.llvm.overrideAttrs (_: rec {
           version = "7.1.0";
         });
+        tscope = super.haskellPackages.threadscope;
       })
     ];
   }) pkgs;
   f = { mkDerivation, array, base, deepseq, directory
       , numeric-limits, parallel, pretty-terminal, random, stdenv, time
-      , fllvm
+      , fllvm, tscope
       }:
       mkDerivation {
         pname = "ray-tracers";
@@ -27,6 +28,9 @@ let
         ];
         librarySystemDepends = [
           fllvm
+        ];
+        executableSystemDepends = [
+          tscope
         ];
         license = "unknown";
         hydraPlatforms = stdenv.lib.platforms.none;
